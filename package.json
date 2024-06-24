@@ -1,0 +1,17 @@
+{
+  "name": "react-navigation-mapper",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@ts-morph/bootstrap": "^0.24.0",
+    "prettier": "^3.3.2",
+    "putout": "^35.35.6",
+    "typescript": "^5.5.2"
+  }
+}
