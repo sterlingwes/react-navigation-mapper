@@ -4,6 +4,7 @@ import { createProject, ts } from "@ts-morph/bootstrap";
 const expectedIssues = [
   "Cannot find global value 'Promise'",
   "Cannot find module",
+  "Cannot find name 'require'",
 ];
 
 const validate = async (code) => {

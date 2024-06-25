@@ -1,0 +1,6905 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Restart.native.tsx should 1`] = `
+"export function restartApp() {}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Restart.tsx should 1`] = `
+"export function restartApp() {}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/screens.tsx should 1`] = `
+"import type { NavigatorScreenParams } from "@react-navigation/native";
+
+export type RootDrawerParamList = {
+  Examples: undefined;
+};
+
+export type LinkComponentDemoParamList = {
+  Article: {
+    author: string;
+  };
+  Albums: undefined;
+};
+
+export const SCREENS = {
+  NativeStack: {
+    title: "Native Stack",
+    component: NativeStack,
+  },
+  SimpleStack: {
+    title: "Simple Stack",
+    component: SimpleStack,
+  },
+  ModalStack: {
+    title: "Modal Stack",
+    component: ModalStack,
+  },
+  MixedStack: {
+    title: "Regular + Modal Stack",
+    component: MixedStack,
+  },
+  MixedHeaderMode: {
+    title: "Float + Screen Header Stack",
+    component: MixedHeaderMode,
+  },
+  StackTransparent: {
+    title: "Transparent Stack",
+    component: StackTransparent,
+  },
+  StackHeaderCustomization: {
+    title: "Header Customization in Stack",
+    component: StackHeaderCustomization,
+  },
+  NativeStackHeaderCustomization: {
+    title: "Header Customization in Native Stack",
+    component: NativeStackHeaderCustomization,
+  },
+  BottomTabs: {
+    title: "Bottom Tabs",
+    component: BottomTabs,
+  },
+  MaterialTopTabs: {
+    title: "Material Top Tabs",
+    component: MaterialTopTabsScreen,
+  },
+  MaterialBottomTabs: {
+    title: "Material Bottom Tabs",
+    component: MaterialBottomTabs,
+  },
+  DynamicTabs: {
+    title: "Dynamic Tabs",
+    component: DynamicTabs,
+  },
+  MasterDetail: {
+    title: "Master Detail",
+    component: MasterDetail,
+  },
+  AuthFlow: {
+    title: "Auth Flow",
+    component: AuthFlow,
+  },
+  StackPreventRemove: {
+    title: "Prevent removing screen in Stack",
+    component: StackPreventRemove,
+  },
+  NativeStackPreventRemove: {
+    title: "Prevent removing screen in Native Stack",
+    component: NativeStackPreventRemove,
+  },
+  LinkComponent: {
+    title: "<Link />",
+    component: LinkComponent,
+  },
+  TabView: {
+    title: "TabView",
+    component: TabView,
+  },
+  DrawerLayout: {
+    title: "Drawer Layout",
+    component: DrawerView,
+  },
+};
+
+export type RootStackParamList = {
+  [P in any]: undefined;
+} & any;
+
+// Make the default RootParamList the same as the RootStackParamList
+declare namespace global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/index.tsx should 1`] = `
+"import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  useFlipper,
+  useReduxDevToolsExtension,
+} from "@react-navigation/devtools";
+import {
+  createDrawerNavigator,
+  DrawerScreenProps,
+} from "@react-navigation/drawer";
+import {
+  CompositeScreenProps,
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  PathConfigMap,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  HeaderStyleInterpolators,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import {
+  I18nManager,
+  LogBox,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  useWindowDimensions,
+} from "react-native";
+import { Divider, List, Provider as PaperProvider } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
+if (Platform.OS !== "web") {
+  LogBox.ignoreLogs(["Require cycle:"]);
+}
+
+const Drawer = createDrawerNavigator<any>();
+const Stack = createStackNavigator<any>();
+
+const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
+const THEME_PERSISTENCE_KEY = "THEME_TYPE";
+
+const SCREEN_NAMES = Object.keys(SCREENS) as keyof (typeof SCREENS)[];
+
+export default function App() {
+  const [theme, setTheme];
+
+  const [isReady];
+  const [initialState];
+
+  const paperTheme;
+
+  const dimensions = useWindowDimensions();
+
+  const navigationRef = useNavigationContainerRef();
+
+  useReduxDevToolsExtension(navigationRef);
+  useFlipper(navigationRef);
+
+  if (!isReady) {
+    return null;
+  }
+
+  const isLargeScreen = dimensions.width >= 1024;
+
+  return (
+    <Providers theme={paperTheme}>
+      <StatusBar
+        translucent
+        barStyle={theme.dark ? "light-content" : "dark-content"}
+        backgroundColor="rgba(0, 0, 0, 0.24)"
+      />
+      <NavigationContainer
+        ref={navigationRef}
+        initialState={initialState}
+        onStateChange={(state) =>
+          AsyncStorage?.setItem(
+            NAVIGATION_PERSISTENCE_KEY,
+            JSON.stringify(state),
+          )
+        }
+        theme={theme}
+        linking={{
+          // To test deep linking on, run the following in the Terminal:
+          // Android: adb shell am start -a android.intent.action.VIEW -d "exp://127.0.0.1:19000/--/simple-stack"
+          // iOS: xcrun simctl openurl booted exp://127.0.0.1:19000/--/simple-stack
+          // Android (bare): adb shell am start -a android.intent.action.VIEW -d "rne://127.0.0.1:19000/--/simple-stack"
+          // iOS (bare): xcrun simctl openurl booted rne://127.0.0.1:19000/--/simple-stack
+          // The first segment of the link is the the scheme + host (returned by \`Linking.makeUrl\`)
+          prefixes: [createURL("/")],
+          config: {
+            initialRouteName: "Home",
+            screens: SCREEN_NAMES.reduce<PathConfigMap<any>>(
+              (acc, name) => {
+                // Convert screen names such as SimpleStack to kebab case (simple-stack)
+                const path = name
+                  .replace(/([A-Z]+)/g, "-$1")
+                  .replace(/^-/, "")
+                  .toLowerCase();
+
+                acc[name] = {
+                  path,
+                  screens: {
+                    Article: {
+                      path: "article/:author?",
+                      parse: {
+                        author: (author: string) =>
+                          author.charAt(0).toUpperCase() +
+                          author.slice(1).replace(/-/g, " "),
+                      },
+                      stringify: {
+                        author: (author: string) =>
+                          author.toLowerCase().replace(/\s/g, "-"),
+                      },
+                    },
+                    Albums: "music",
+                    Chat: "chat",
+                    Contacts: "people",
+                    NewsFeed: "feed",
+                    Dialog: "dialog",
+                  },
+                };
+
+                return acc;
+              },
+              {
+                Home: {
+                  screens: {
+                    Examples: "",
+                  },
+                },
+                NotFound: "*",
+              },
+            ),
+          },
+        }}
+        fallback={<Text>Loading…</Text>}
+        documentTitle={{
+          formatter: (options, route) =>
+            \`${options?.title ?? route?.name} - React Navigation Example\`,
+        }}
+      >
+        <Stack.Navigator
+          screenOptions={{
+            headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            options={{
+              headerShown: false,
+            }}
+          >
+            {() => (
+              <Drawer.Navigator
+                screenOptions={{
+                  drawerType: isLargeScreen ? "permanent" : undefined,
+                  overlayAccessibilityLabel: "Close drawer",
+                }}
+              >
+                <Drawer.Screen
+                  name="Examples"
+                  options={{
+                    title: "Examples",
+                    drawerIcon: ({ size, color }) => (
+                      <MaterialIcons size={size} color={color} name="folder" />
+                    ),
+                  }}
+                >
+                  {({
+                    navigation,
+                  }: CompositeScreenProps<
+                    DrawerScreenProps<any, "Examples">,
+                    StackScreenProps<any>
+                  >) => (
+                    <ScrollView
+                      style={{
+                        backgroundColor: theme.colors.background,
+                      }}
+                    >
+                      <SafeAreaView edges={["right", "bottom", "left"]}>
+                        <SettingsItem
+                          label="Right to left"
+                          value={I18nManager.getConstants().isRTL}
+                          onValueChange={() => {
+                            I18nManager.forceRTL(
+                              !I18nManager.getConstants().isRTL,
+                            );
+                          }}
+                        />
+                        <Divider />
+                        <SettingsItem
+                          label="Dark theme"
+                          value={theme.dark}
+                          onValueChange={() => {
+                            AsyncStorage?.setItem(
+                              THEME_PERSISTENCE_KEY,
+                              theme.dark ? "light" : "dark",
+                            );
+
+                            setTheme((t) =>
+                              t.dark ? DefaultTheme : DarkTheme,
+                            );
+                          }}
+                        />
+                        <Divider />
+                        {SCREEN_NAMES.map((name) => (
+                          <List.Item
+                            key={name}
+                            testID={name}
+                            title={SCREENS[name].title}
+                            onPress={() => {
+                              navigation.navigate(name);
+                            }}
+                          />
+                        ))}
+                      </SafeAreaView>
+                    </ScrollView>
+                  )}
+                </Drawer.Screen>
+              </Drawer.Navigator>
+            )}
+          </Stack.Screen>
+          <Stack.Screen
+            name="NotFound"
+            component={NotFound}
+            options={{
+              title: "Oops!",
+            }}
+          />
+          {SCREEN_NAMES.map((name) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              getComponent={() => SCREENS[name].component}
+              options={{
+                title: SCREENS[name].title,
+              }}
+            />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Providers>
+  );
+}
+
+const Providers = ({
+  theme,
+  children,
+}: {
+  theme: ReactNativePaper.Theme;
+  children: React.ReactNode;
+}) => {
+  return (
+    <PaperProvider theme={theme}>
+      <ActionSheetProvider>
+        <>{children}</>
+      </ActionSheetProvider>
+    </PaperProvider>
+  );
+};
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NotFound.tsx should 1`] = `
+"import type { StackScreenProps } from "@react-navigation/stack";
+import { StyleSheet, Text, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const NotFoundScreen = ({
+  route,
+  navigation,
+}: StackScreenProps<any, "NotFound">) => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>404 Not Found ({route.path})</Text>
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate("Home")}
+        style={styles.button}
+      >
+        Go to home
+      </Button>
+    </View>
+  );
+};
+
+export default NotFoundScreen;
+
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 36,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+  },
+  button: {
+    margin: 24,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import {
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Appbar, Button } from "react-native-paper";
+
+export type NativeStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push Albums
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({
+  navigation,
+}: NativeStackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.navigate("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Navigate to article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const NativeStack = createNativeStackNavigator<any>();
+
+export default function NativeStackScreen({}: NativeStackScreenProps<ParamListBase>) {
+  const onPress = () => {
+    Alert.alert(
+      "Never gonna give you up!",
+      "Never gonna let you down! Never gonna run around and desert you!",
+    );
+  };
+
+  return (
+    <NativeStack.Navigator>
+      <NativeStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route, navigation }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          headerTintColor: "white",
+          headerTitle: ({ tintColor }) => (
+            <Appbar.Action
+              color={tintColor}
+              icon="signal-5g"
+              onPress={onPress}
+            />
+          ),
+          headerLeft: ({ tintColor, canGoBack }) =>
+            canGoBack ? (
+              <Appbar.Action
+                color={tintColor}
+                icon="arrow-left-thick"
+                onPress={navigation.goBack}
+              />
+            ) : null,
+          headerRight: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="music" onPress={onPress} />
+          ),
+          headerBackground: () => (
+            <Image
+              source={require("../../assets/cpu.jpg")}
+              style={styles.headerBackground}
+            />
+          ),
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <NativeStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+          headerLeft: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="spa" onPress={onPress} />
+          ),
+        }}
+      />
+      <NativeStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          headerTintColor: "tomato",
+          headerStyle: {
+            backgroundColor: "papayawhip",
+          },
+          headerBackVisible: true,
+          headerLeft: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="music" onPress={onPress} />
+          ),
+        }}
+      />
+    </NativeStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+  headerBackground: {
+    height: undefined,
+    width: undefined,
+    flex: 1,
+    resizeMode: "cover",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MaterialTopTabs.tsx should 1`] = `
+"import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import type { ParamListBase } from "@react-navigation/native";
+import type { StackScreenProps } from "@react-navigation/stack";
+
+const MaterialTopTabs = createMaterialTopTabNavigator<any>();
+
+const ChatScreen = () => <Chat bottom />;
+
+export default function MaterialTopTabsScreen({}: StackScreenProps<ParamListBase>) {
+  return (
+    <MaterialTopTabs.Navigator>
+      <MaterialTopTabs.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          title: "Chat",
+        }}
+      />
+      <MaterialTopTabs.Screen
+        name="Contacts"
+        component={Contacts}
+        options={{
+          title: "Contacts",
+        }}
+      />
+      <MaterialTopTabs.Screen
+        name="Albums"
+        component={Albums}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </MaterialTopTabs.Navigator>
+  );
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MixedStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() =>
+              navigation.push("Article", {
+                author: "Dalek",
+              })
+            }
+            style={styles.button}
+          >
+            Push article
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.goBack()}
+            style={styles.button}
+          >
+            Go back
+          </Button>
+        </View>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => navigation.push("Albums")}
+            style={styles.button}
+          >
+            Push album
+          </Button>
+        </View>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => navigation.push("Albums")}
+            style={styles.button}
+          >
+            Push album
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.goBack()}
+            style={styles.button}
+          >
+            Go back
+          </Button>
+        </View>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() =>
+              navigation.push("Article", {
+                author: "The Doctor",
+              })
+            }
+            style={styles.button}
+          >
+            Push article
+          </Button>
+        </View>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const MixedStack = createStackNavigator<any>();
+
+export default function MixedStackScreen({}: any) {
+  return (
+    <MixedStack.Navigator>
+      <MixedStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <MixedStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          presentation: "modal",
+        }}
+      />
+    </MixedStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/ModalStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const ModalStack = createStackNavigator<any>();
+
+export default function ModalStackScreen({}: any) {
+  return (
+    <ModalStack.Navigator
+      screenOptions={{
+        presentation: "modal",
+      }}
+    >
+      <ModalStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <ModalStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </ModalStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NativeStack.tsx should 1`] = `
+"import { useHeaderHeight } from "@react-navigation/elements";
+import type { ParamListBase } from "@react-navigation/native";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type NativeStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.replace("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Replace with feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push Albums
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({
+  navigation,
+}: NativeStackScreenProps<any, "Albums">) => {
+  const headerHeight = useHeaderHeight();
+
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        paddingTop: headerHeight,
+      }}
+    >
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.navigate("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Navigate to article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const NativeStack = createNativeStackNavigator<any>();
+
+export default function NativeStackScreen({}: NativeStackScreenProps<ParamListBase>) {
+  return (
+    <NativeStack.Navigator>
+      <NativeStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          headerLargeTitle: true,
+          headerLargeTitleShadowVisible: false,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <NativeStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+          fullScreenGestureEnabled: true,
+        }}
+      />
+      <NativeStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          presentation: "modal",
+          headerTransparent: true,
+          headerBlurEffect: "light",
+        }}
+      />
+    </NativeStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/StackTransparent.tsx should 1`] = `
+"import { ParamListBase, useTheme } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+  useCardAnimation,
+} from "@react-navigation/stack";
+import {
+  Animated,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Button, Paragraph } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Dialog")}
+          style={styles.button}
+        >
+          Show Dialog
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("NewsFeed")}
+          style={styles.button}
+        >
+          Push NewsFeed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({ navigation }: StackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Dialog")}
+          style={styles.button}
+        >
+          Show Dialog
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const DialogScreen = ({ navigation }: StackScreenProps<any>) => {
+  const { colors } = useTheme();
+  const { current } = useCardAnimation();
+
+  return (
+    <View style={styles.container}>
+      <Pressable style={styles.backdrop} onPress={navigation.goBack} />
+      <Animated.View
+        style={[
+          styles.dialog,
+          {
+            backgroundColor: colors.card,
+            transform: [
+              {
+                scale: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.9, 1],
+                  extrapolate: "clamp",
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Paragraph>
+          Mise en place is a French term that literally means “put in place.” It
+          also refers to a way cooks in professional kitchens and restaurants
+          set up their work stations—first by gathering all ingredients for a
+          recipes, partially preparing them (like measuring out and chopping),
+          and setting them all near each other. Setting up mise en place before
+          cooking is another top tip for home cooks, as it seriously helps with
+          organization. It’ll pretty much guarantee you never forget to add an
+          ingredient and save you time from running back and forth from the
+          pantry ten times.
+        </Paragraph>
+        <Button style={styles.close} compact onPress={navigation.goBack}>
+          Okay
+        </Button>
+      </Animated.View>
+    </View>
+  );
+};
+
+const TransparentStack = createStackNavigator<any>();
+
+export default function TransparentStackScreen({}: any) {
+  return (
+    <TransparentStack.Navigator>
+      <TransparentStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <TransparentStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <TransparentStack.Screen
+        name="Dialog"
+        component={DialogScreen}
+        options={{
+          headerShown: false,
+          presentation: "transparentModal",
+        }}
+      />
+    </TransparentStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dialog: {
+    padding: 16,
+    width: "90%",
+    maxWidth: 400,
+    borderRadius: 3,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+  },
+  close: {
+    alignSelf: "flex-end",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MaterialBottomTabs.tsx should 1`] = `
+"import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import type { NavigatorScreenParams } from "@react-navigation/native";
+import { StyleSheet } from "react-native";
+
+const MaterialBottomTabs = createMaterialBottomTabNavigator<any>();
+
+export default function MaterialBottomTabsScreen() {
+  return (
+    <MaterialBottomTabs.Navigator barStyle={styles.tabBar}>
+      <MaterialBottomTabs.Screen
+        name="TabStack"
+        options={{
+          tabBarLabel: "Article",
+          tabBarIcon: "file-document",
+          tabBarColor: "#C9E7F8",
+        }}
+      >
+        {(props) => (
+          <SimpleStackScreen
+            {...props}
+            screenOptions={{
+              headerShown: false,
+            }}
+          />
+        )}
+      </MaterialBottomTabs.Screen>
+      <MaterialBottomTabs.Screen
+        name="TabChat"
+        component={Chat}
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: "message-reply",
+          tabBarColor: "#9FD5C9",
+          tabBarBadge: true,
+        }}
+      />
+      <MaterialBottomTabs.Screen
+        name="TabContacts"
+        component={Contacts}
+        options={{
+          tabBarLabel: "Contacts",
+          tabBarIcon: "contacts",
+          tabBarColor: "#F7EAA2",
+        }}
+      />
+      <MaterialBottomTabs.Screen
+        name="TabAlbums"
+        component={Albums}
+        options={{
+          tabBarLabel: "Albums",
+          tabBarIcon: "image-album",
+          tabBarColor: "#FAD4D6",
+        }}
+      />
+    </MaterialBottomTabs.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: "white",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/DrawerView.tsx should 1`] = `
+"import { useActionSheet } from "@expo/react-native-action-sheet";
+import { useTheme } from "@react-navigation/native";
+import { StyleSheet, View } from "react-native";
+import { Drawer, useDrawerProgress } from "react-native-drawer-layout";
+import { Button, Text } from "react-native-paper";
+import Animated, {
+  interpolate,
+  isConfigured,
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+const RealDrawer = () => {
+  const progress = useDrawerProgress() as SharedValue<number>;
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(progress.value, [0, 1], [56, 0]),
+        },
+      ],
+    };
+  });
+
+  return (
+    <View style={styles.realDrawerWrapper}>
+      <Animated.View style={[styles.realDrawer, animatedStyle]} />
+    </View>
+  );
+};
+
+const DRAWER_TYPES = ["front", "back", "slide"] as any;
+
+export default function DrawerView() {
+  const { showActionSheetWithOptions } = useActionSheet();
+  const { colors } = useTheme();
+
+  const [open, setOpen];
+  const [legacy, setLegacy];
+
+  const [drawerType, setDrawerType];
+
+  const [drawerPosition, setDrawerPosition];
+
+  return (
+    <Drawer
+      useLegacyImplementation={legacy}
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      drawerType={drawerType}
+      drawerPosition={drawerPosition}
+      renderDrawerContent={() => {
+        return (
+          <View style={styles.container}>
+            <Button color="tomato" onPress={() => setOpen(false)}>
+              Close drawer
+            </Button>
+          </View>
+        );
+      }}
+    >
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        {!legacy && <RealDrawer />}
+        <View style={styles.buttons}>
+          <Button
+            mode="contained"
+            onPress={() => setOpen((prevOpen) => !prevOpen)}
+          >
+            {open ? "Close" : "Open"} drawer
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() =>
+              setDrawerPosition((prevPosition) =>
+                prevPosition === "left" ? "right" : "left",
+              )
+            }
+          >
+            Change position ({drawerPosition})
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() =>
+              showActionSheetWithOptions(
+                {
+                  options: DRAWER_TYPES.map((option) => {
+                    if (option === drawerType) {
+                      return \`${option} (current)\`;
+                    }
+
+                    return option;
+                  }),
+                },
+                (index) => {
+                  if (index != null) {
+                    setDrawerType(DRAWER_TYPES[index]);
+                  }
+                },
+              )
+            }
+          >
+            Change type ({drawerType})
+          </Button>
+          {isConfigured?.() ? (
+            <Button
+              mode="outlined"
+              onPress={() => setLegacy((prevLegacy) => !prevLegacy)}
+            >
+              Change Reanimated ({legacy ? 1 : 2})
+            </Button>
+          ) : (
+            <Text>Using Reanimated 1</Text>
+          )}
+        </View>
+      </View>
+    </Drawer>
+  );
+}
+
+DrawerView.title = "Drawer Layout";
+DrawerView.linking = {};
+DrawerView.options = {
+  headerShown: true,
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+  },
+  buttons: {
+    gap: 8,
+    alignItems: "center",
+  },
+  realDrawerWrapper: {
+    width: 64,
+    height: 72,
+    marginBottom: 8,
+    overflow: "hidden",
+  },
+  realDrawer: {
+    position: "absolute",
+    top: 0,
+    start: 0,
+    end: 8,
+    bottom: 0,
+    backgroundColor: "#ebdec1",
+    borderColor: "#3e3a3a",
+    borderWidth: 4,
+    borderBottomWidth: 0,
+    borderRadius: 2,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/BottomTabs.tsx should 1`] = `
+"import {
+  createBottomTabNavigator,
+  useBottomTabBarHeight,
+} from "@react-navigation/bottom-tabs";
+import { HeaderBackButton, useHeaderHeight } from "@react-navigation/elements";
+import {
+  getFocusedRouteNameFromRoute,
+  NavigatorScreenParams,
+  ParamListBase,
+  useIsFocused,
+} from "@react-navigation/native";
+import type { StackScreenProps } from "@react-navigation/stack";
+import { ScrollView, StatusBar, StyleSheet } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+const getTabBarIcon =
+  (name: string) =>
+  ({ color, size }: { color: string; size: number }) => (
+    <MaterialCommunityIcons name={name} color={color} size={size} />
+  );
+
+const AlbumsScreen = () => {
+  const headerHeight = useHeaderHeight();
+  const tabBarHeight = useBottomTabBarHeight();
+  const isFocused = useIsFocused();
+
+  return (
+    <>
+      {isFocused && <StatusBar barStyle="light-content" />}
+      <ScrollView
+        contentContainerStyle={{
+          paddingTop: headerHeight,
+          paddingBottom: tabBarHeight,
+        }}
+      >
+        <Albums scrollEnabled={false} />
+      </ScrollView>
+    </>
+  );
+};
+
+const BottomTabs = createBottomTabNavigator<any>();
+
+export default function BottomTabsScreen({
+  navigation,
+  route,
+}: StackScreenProps<ParamListBase, string>) {
+  return (
+    <BottomTabs.Navigator
+      screenOptions={{
+        headerLeft: (props) => (
+          <HeaderBackButton {...props} onPress={navigation.goBack} />
+        ),
+      }}
+    >
+      <BottomTabs.Screen
+        name="TabStack"
+        component={SimpleStackScreen}
+        options={{
+          title: "Article",
+          tabBarIcon: getTabBarIcon("file-document"),
+        }}
+      />
+      <BottomTabs.Screen
+        name="TabChat"
+        component={Chat}
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: getTabBarIcon("message-reply"),
+          tabBarBadge: 2,
+        }}
+      />
+      <BottomTabs.Screen
+        name="TabContacts"
+        component={Contacts}
+        options={{
+          title: "Contacts",
+          tabBarIcon: getTabBarIcon("contacts"),
+        }}
+      />
+      <BottomTabs.Screen
+        name="TabAlbums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          headerTintColor: "#fff",
+          headerTransparent: true,
+          headerBackground: () => (
+            <BlurView
+              tint="dark"
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+            />
+          ),
+          tabBarIcon: getTabBarIcon("image-album"),
+          tabBarInactiveTintColor: "rgba(255, 255, 255, 0.5)",
+          tabBarActiveTintColor: "#fff",
+          tabBarStyle: {
+            position: "absolute",
+            borderTopColor: "rgba(0, 0, 0, .2)",
+          },
+          tabBarBackground: () => (
+            <BlurView
+              tint="dark"
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+            />
+          ),
+        }}
+      />
+    </BottomTabs.Navigator>
+  );
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NativeStackPreventRemove.tsx should 1`] = `
+"import { UNSTABLE_usePreventRemove } from "@react-navigation/core";
+import {
+  CommonActions,
+  ParamListBase,
+  useTheme,
+} from "@react-navigation/native";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Input")}
+          style={styles.button}
+        >
+          Push Input
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.popToTop()}
+          style={styles.button}
+        >
+          Pop to top
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const InputScreen = ({ navigation }: NativeStackScreenProps<any, "Input">) => {
+  const [text, setText];
+  const { colors } = useTheme();
+
+  const hasUnsavedChanges = Boolean(text);
+
+  UNSTABLE_usePreventRemove(hasUnsavedChanges, ({ data }) => {
+    if (Platform.OS === "web") {
+      const discard = confirm(
+        "You have unsaved changes. Discard them and leave the screen?",
+      );
+
+      if (discard) {
+        navigation.dispatch(data.action);
+      }
+    } else {
+      Alert.alert(
+        "Discard changes?",
+        "You have unsaved changes. Discard them and leave the screen?",
+        [
+          {
+            text: "Don't leave",
+            style: "cancel",
+            onPress: () => {},
+          },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => navigation.dispatch(data.action),
+          },
+        ],
+      );
+    }
+  });
+
+  return (
+    <View style={styles.content}>
+      <TextInput
+        autoFocus
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
+        ]}
+        value={text}
+        placeholder="Type something…"
+        onChangeText={setText}
+      />
+      <Button
+        mode="outlined"
+        color="tomato"
+        onPress={() =>
+          navigation.dispatch({
+            ...CommonActions.goBack(),
+            payload: {
+              confirmed: true,
+            },
+          })
+        }
+        style={styles.button}
+      >
+        Discard and go back
+      </Button>
+      <Button
+        mode="outlined"
+        onPress={() =>
+          navigation.push("Article", {
+            author: text,
+          })
+        }
+        style={styles.button}
+      >
+        Push Article
+      </Button>
+    </View>
+  );
+};
+
+const Stack = createNativeStackNavigator<any>();
+
+export default function StackScreen({}: any) {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Input"
+        component={InputScreen}
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen name="Article" component={ArticleScreen} />
+    </Stack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  input: {
+    margin: 8,
+    padding: 10,
+    borderRadius: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(0, 0, 0, 0.08)",
+  },
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/StackPreventRemove.tsx should 1`] = `
+"import {
+  CommonActions,
+  ParamListBase,
+  useTheme,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Input")}
+          style={styles.button}
+        >
+          Push Input
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.popToTop()}
+          style={styles.button}
+        >
+          Pop to top
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const InputScreen = ({ navigation }: StackScreenProps<any, "Input">) => {
+  const [text, setText];
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.content}>
+      <TextInput
+        autoFocus
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
+        ]}
+        value={text}
+        placeholder="Type something…"
+        onChangeText={setText}
+      />
+      <Button
+        mode="outlined"
+        color="tomato"
+        onPress={() =>
+          navigation.dispatch({
+            ...CommonActions.goBack(),
+            payload: {
+              confirmed: true,
+            },
+          })
+        }
+        style={styles.button}
+      >
+        Discard and go back
+      </Button>
+      <Button
+        mode="outlined"
+        onPress={() =>
+          navigation.push("Article", {
+            author: text,
+          })
+        }
+        style={styles.button}
+      >
+        Push Article
+      </Button>
+    </View>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({}: any) {
+  return (
+    <SimpleStack.Navigator>
+      <SimpleStack.Screen name="Input" component={InputScreen} />
+      <SimpleStack.Screen name="Article" component={ArticleScreen} />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  input: {
+    margin: 8,
+    padding: 10,
+    borderRadius: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(0, 0, 0, 0.08)",
+  },
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MixedHeaderMode.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  HeaderStyleInterpolators,
+  StackScreenProps,
+  TransitionPresets,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type SimpleStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: StackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Navigate to album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({}: StackScreenProps<ParamListBase>) {
+  return (
+    <SimpleStack.Navigator
+      screenOptions={{
+        headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+      }}
+    >
+      <SimpleStack.Group
+        screenOptions={{
+          ...TransitionPresets.SlideFromRightIOS,
+          headerMode: "float",
+        }}
+      >
+        <SimpleStack.Screen
+          name="Article"
+          component={ArticleScreen}
+          options={({ route }) => ({
+            title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          })}
+          initialParams={{
+            author: "Gandalf",
+          }}
+        />
+        <SimpleStack.Screen
+          name="NewsFeed"
+          component={NewsFeedScreen}
+          options={{
+            title: "Feed",
+          }}
+        />
+      </SimpleStack.Group>
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          ...TransitionPresets.ModalSlideFromBottomIOS,
+          headerMode: "screen",
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/LinkComponent.tsx should 1`] = `
+"import {
+  Link,
+  ParamListBase,
+  StackActions,
+  useLinkProps,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const LinkButton = ({
+  to,
+  ...rest
+}: React.ComponentProps<typeof Button> & any[0]) => {
+  const props = useLinkProps({
+    to,
+  });
+
+  return <Button {...props} {...rest} />;
+};
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Link
+          to={{
+            screen: "LinkComponent",
+            params: {
+              screen: "Albums",
+            },
+          }}
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Go to /link-component/music
+        </Link>
+        <Link
+          to="/link-component/music"
+          action={StackActions.replace("Albums")}
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Replace with /link-component/music
+        </Link>
+        <LinkButton
+          to="/link-component/music"
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /link-component/music
+        </LinkButton>
+        <LinkButton
+          to={{
+            screen: "Home",
+          }}
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /
+        </LinkButton>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Link
+          to="/link-component/article/babel"
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Go to /link-component/article
+        </Link>
+        <LinkButton
+          to="/link-component/article/babel"
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /link-component/article
+        </LinkButton>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({ navigation, ...rest }: any) {
+  return (
+    <SimpleStack.Navigator {...rest}>
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/SimpleStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackNavigationOptions,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type SimpleStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.replace("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Replace with feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() =>
+            navigation.setParams({
+              author:
+                route.params?.author === "Gandalf" ? "Babel fish" : "Gandalf",
+            })
+          }
+          style={styles.button}
+        >
+          Update params
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: StackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate("Albums")}
+          style={styles.button}
+        >
+          Navigate to album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({
+  screenOptions,
+}: StackScreenProps<ParamListBase> & {
+  screenOptions?: StackNavigationOptions;
+}) {
+  return (
+    <SimpleStack.Navigator screenOptions={screenOptions}>
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { ScrollView } from "react-native";
+import { List } from "react-native-paper";
+
+const EXAMPLE_SCREENS = {
+  ScrollableTabBar,
+  AutoWidthTabBar,
+  TabBarIcon,
+  CustomIndicator,
+  CustomTabBar,
+  Coverflow,
+} as any;
+
+const EXAMPLE_SCREEN_NAMES = Object.keys(
+  EXAMPLE_SCREENS,
+) as keyof (typeof EXAMPLE_SCREENS)[];
+
+export type TabViewStackParams = {
+  [Key in keyof typeof EXAMPLE_SCREENS]: undefined;
+} & {
+  ExampleList: undefined;
+};
+
+const TabViewStack = createStackNavigator<any>();
+
+const ExampleListScreen = ({
+  navigation,
+}: StackScreenProps<any, "ExampleList">) => {
+  return (
+    <ScrollView>
+      {EXAMPLE_SCREEN_NAMES.map((name) => (
+        <List.Item
+          key={name}
+          testID={name}
+          title={EXAMPLE_SCREENS[name].options.title}
+          onPress={() => {
+            navigation.navigate(name);
+          }}
+        />
+      ))}
+    </ScrollView>
+  );
+};
+
+export default function TabViewStackScreen({}: StackScreenProps<ParamListBase>) {
+  return (
+    <TabViewStack.Navigator
+      screenOptions={{
+        headerMode: "screen",
+        cardStyle: {
+          flex: 1,
+        },
+      }}
+    >
+      <TabViewStack.Screen
+        name="ExampleList"
+        component={ExampleListScreen}
+        options={{
+          title: "TabView Examples",
+        }}
+      />
+      {EXAMPLE_SCREEN_NAMES.map((name) => {
+        return (
+          <TabViewStack.Screen
+            key={name}
+            name={name}
+            component={EXAMPLE_SCREENS[name]}
+            options={EXAMPLE_SCREENS[name].options}
+          />
+        );
+      })}
+    </TabViewStack.Navigator>
+  );
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/StackHeaderCustomization.tsx should 1`] = `
+"import { HeaderBackground, useHeaderHeight } from "@react-navigation/elements";
+import { ParamListBase, useTheme } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  Header,
+  StackHeaderProps,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import {
+  Alert,
+  Animated,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Appbar, Button } from "react-native-paper";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  const headerHeight = useHeaderHeight();
+
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        paddingTop: headerHeight,
+      }}
+    >
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+function CustomHeader(props: StackHeaderProps) {
+  const { current, next } = props.progress;
+
+  const progress = Animated.add(current, next || 0);
+  const opacity = progress.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [0, 1, 0],
+  });
+
+  return (
+    <>
+      <Header {...props} />
+      <Animated.Text
+        style={[
+          styles.banner,
+          {
+            opacity,
+          },
+        ]}
+      >
+        Why hello there, pardner!
+      </Animated.Text>
+    </>
+  );
+}
+
+export default function HeaderCustomizationScreen({}: any) {
+  const { colors, dark } = useTheme();
+  const [headerTitleCentered, setHeaderTitleCentered];
+
+  return (
+    <SimpleStack.Navigator
+      screenOptions={{
+        headerMode: "float",
+      }}
+    >
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author}\`,
+          header: (props) => <CustomHeader {...props} />,
+          headerTintColor: "#fff",
+          headerStyle: {
+            backgroundColor: "#ff005d",
+          },
+          headerBackTitleVisible: false,
+          headerTitleAlign: headerTitleCentered ? "center" : "left",
+          headerBackImage: ({ tintColor }) => (
+            <MaterialCommunityIcons
+              name="arrow-left-circle-outline"
+              color={tintColor}
+              size={24}
+              style={{
+                marginHorizontal: Platform.OS === "ios" ? 8 : 0,
+              }}
+            />
+          ),
+          headerRight: ({ tintColor }) => (
+            <Appbar.Action
+              color={tintColor}
+              icon="dots-horizontal-circle-outline"
+              onPress={() => {
+                setHeaderTitleCentered((centered) => !centered);
+                Alert.alert(
+                  "Never gonna give you up!",
+                  "Never gonna let you down! Never gonna run around and desert you!",
+                );
+              }}
+            />
+          ),
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          headerBackTitle: "Back",
+          headerTransparent: true,
+          headerBackground: () => (
+            <HeaderBackground
+              style={{
+                backgroundColor: "blue",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderBottomColor: colors.border,
+              }}
+            >
+              <BlurView
+                tint={dark ? "dark" : "light"}
+                intensity={75}
+                style={StyleSheet.absoluteFill}
+              />
+            </HeaderBackground>
+          ),
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+  banner: {
+    textAlign: "center",
+    color: "tomato",
+    backgroundColor: "papayawhip",
+    padding: 4,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/AuthFlow.tsx should 1`] = `
+"import { ParamListBase, useTheme } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { ActivityIndicator, StyleSheet, TextInput, View } from "react-native";
+import { Button, Title } from "react-native-paper";
+
+const AuthContext;
+
+const SplashScreen = () => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.content}>
+      <ActivityIndicator color={colors.primary} />
+    </View>
+  );
+};
+
+const SignInScreen = ({ navigation }: StackScreenProps<any, "SignIn">) => {
+  const { signIn };
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.content}>
+      <TextInput
+        placeholder="Username"
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
+        ]}
+      />
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
+        ]}
+      />
+      <Button mode="contained" onPress={signIn} style={styles.button}>
+        Sign in
+      </Button>
+      <Button onPress={() => navigation.navigate("Chat")} style={styles.button}>
+        Go to Chat
+      </Button>
+    </View>
+  );
+};
+
+const HomeScreen = ({ navigation }: StackScreenProps<any, "Home">) => {
+  const { signOut };
+
+  return (
+    <View style={styles.content}>
+      <Title style={styles.text}>Signed in successfully 🎉</Title>
+      <Button onPress={signOut} style={styles.button}>
+        Sign out
+      </Button>
+      <Button onPress={() => navigation.navigate("Chat")} style={styles.button}>
+        Go to Chat
+      </Button>
+    </View>
+  );
+};
+
+const ChatScreen = () => {
+  const { isSignedIn, signIn, signOut };
+
+  return (
+    <View style={styles.content}>
+      <Title style={styles.text}>What's up?</Title>
+      {isSignedIn ? (
+        <Button onPress={signOut} style={styles.button}>
+          Sign out
+        </Button>
+      ) : (
+        <Button onPress={signIn} style={styles.button}>
+          Sign in
+        </Button>
+      )}
+    </View>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({}: StackScreenProps<ParamListBase>) {
+  const [state];
+
+  const isSignedIn = state.userToken !== undefined;
+
+  const authContext;
+
+  if (state.isLoading) {
+    return <SplashScreen />;
+  }
+
+  return (
+    <AuthContext.Provider value={authContext}>
+      <SimpleStack.Navigator>
+        {!isSignedIn ? (
+          <SimpleStack.Screen
+            name="SignIn"
+            options={{
+              title: "Sign in",
+              animationTypeForReplace: state.isSignout ? "pop" : "push",
+            }}
+            component={SignInScreen}
+          />
+        ) : (
+          <SimpleStack.Screen name="Home" component={HomeScreen} />
+        )}
+        <SimpleStack.Screen
+          navigationKey={String(isSignedIn)}
+          name="Chat"
+          component={ChatScreen}
+        />
+      </SimpleStack.Navigator>
+    </AuthContext.Provider>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    padding: 16,
+    justifyContent: "center",
+  },
+  input: {
+    margin: 8,
+    padding: 10,
+    borderRadius: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(0, 0, 0, 0.08)",
+  },
+  button: {
+    margin: 8,
+  },
+  text: {
+    textAlign: "center",
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/DynamicTabs.tsx should 1`] = `
+"import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { StyleSheet, View } from "react-native";
+import { Button, Title } from "react-native-paper";
+import Feather from "react-native-vector-icons/Feather";
+
+const BottomTabs = createBottomTabNavigator<any>();
+
+export default function BottomTabsScreen() {
+  const [tabs, setTabs];
+
+  return (
+    <BottomTabs.Navigator>
+      {tabs.map((i) => (
+        <BottomTabs.Screen
+          key={i}
+          name={\`tab-${i}\`}
+          options={{
+            title: \`Tab ${i}\`,
+            tabBarIcon: ({ color, size }) => (
+              <Feather name="octagon" color={color} size={size} />
+            ),
+          }}
+        >
+          {() => (
+            <View style={styles.container}>
+              <Title>Tab {i}</Title>
+              <Button onPress={() => setTabs((tabs) => [...tabs, tabs.length])}>
+                Add a tab
+              </Button>
+              <Button
+                onPress={() =>
+                  setTabs((tabs) =>
+                    tabs.length > 1 ? tabs.slice(0, -1) : tabs,
+                  )
+                }
+              >
+                Remove a tab
+              </Button>
+            </View>
+          )}
+        </BottomTabs.Screen>
+      ))}
+    </BottomTabs.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MasterDetail.tsx should 1`] = `
+"import {
+  createDrawerNavigator,
+  DrawerContent,
+  DrawerContentComponentProps,
+  DrawerScreenProps,
+} from "@react-navigation/drawer";
+import {
+  ParamListBase,
+  useNavigation,
+  useTheme,
+} from "@react-navigation/native";
+import type { StackScreenProps } from "@react-navigation/stack";
+import { useWindowDimensions } from "react-native";
+import { Appbar } from "react-native-paper";
+
+const useIsLargeScreen = () => {
+  const dimensions = useWindowDimensions();
+
+  return dimensions.width > 414;
+};
+
+const Header = ({
+  onGoBack,
+  title,
+}: {
+  onGoBack: () => void;
+  title: string;
+}) => {
+  const { colors } = useTheme();
+  const isLargeScreen = useIsLargeScreen();
+
+  return (
+    <Appbar.Header
+      style={{
+        backgroundColor: colors.card,
+        elevation: 1,
+      }}
+    >
+      {isLargeScreen ? null : <Appbar.BackAction onPress={onGoBack} />}
+      <Appbar.Content title={title} />
+    </Appbar.Header>
+  );
+};
+
+const ArticleScreen = ({ navigation }: DrawerScreenProps<any, "Article">) => {
+  return (
+    <>
+      <Header title="Article" onGoBack={() => navigation.toggleDrawer()} />
+      <Article />
+    </>
+  );
+};
+
+const NewsFeedScreen = ({ navigation }: DrawerScreenProps<any, "NewsFeed">) => {
+  return (
+    <>
+      <Header title="Feed" onGoBack={() => navigation.toggleDrawer()} />
+      <NewsFeed />
+    </>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: DrawerScreenProps<any, "Albums">) => {
+  return (
+    <>
+      <Header title="Albums" onGoBack={() => navigation.toggleDrawer()} />
+      <Albums />
+    </>
+  );
+};
+
+const CustomDrawerContent = (props: DrawerContentComponentProps) => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  return (
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: colors.card,
+          elevation: 1,
+        }}
+      >
+        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Pages" />
+      </Appbar.Header>
+      <DrawerContent {...props} />
+    </>
+  );
+};
+
+const Drawer = createDrawerNavigator<any>();
+
+export default function DrawerScreen({ navigation, ...rest }: any) {
+  const isLargeScreen = useIsLargeScreen();
+
+  return (
+    <Drawer.Navigator
+      backBehavior="none"
+      defaultStatus="open"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerType: isLargeScreen ? "permanent" : "back",
+        drawerStyle: isLargeScreen
+          ? null
+          : {
+              width: "100%",
+            },
+        drawerContentContainerStyle: {
+          paddingTop: 4,
+        },
+        overlayColor: "transparent",
+      }}
+      {...rest}
+    >
+      <Drawer.Screen name="Article" component={ArticleScreen} />
+      <Drawer.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+        }}
+      />
+      <Drawer.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </Drawer.Navigator>
+  );
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/CustomTabBar.tsx should 1`] = `
+"import {
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  contacts: () => <Contacts />,
+  albums: () => <Albums />,
+  article: () => <Article />,
+  chat: () => <Chat />,
+});
+
+const CustomTabBar = () => {
+  const insets = useSafeAreaInsets();
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderItem =
+    ({
+      navigationState,
+      position,
+    }: {
+      navigationState: any;
+      position: Animated.AnimatedInterpolation<number>;
+    }) =>
+    ({ route, index }: { route: any; index: number }) => {
+      const inputRange = navigationState.routes.map((_, i) => i);
+
+      const activeOpacity = position.interpolate({
+        inputRange,
+        outputRange: inputRange.map((i: number) => (i === index ? 1 : 0)),
+      });
+
+      const inactiveOpacity = position.interpolate({
+        inputRange,
+        outputRange: inputRange.map((i: number) => (i === index ? 0 : 1)),
+      });
+
+      return (
+        <View style={styles.tab}>
+          <Animated.View
+            style={[
+              styles.item,
+              {
+                opacity: inactiveOpacity,
+              },
+            ]}
+          >
+            <Ionicons
+              name={route.icon}
+              size={26}
+              style={[styles.icon, styles.inactive]}
+            />
+            <Text style={[styles.label, styles.inactive]}>{route.title}</Text>
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.item,
+              styles.activeItem,
+              {
+                opacity: activeOpacity,
+              },
+            ]}
+          >
+            <Ionicons
+              name={route.icon}
+              size={26}
+              style={[styles.icon, styles.active]}
+            />
+            <Text style={[styles.label, styles.active]}>{route.title}</Text>
+          </Animated.View>
+        </View>
+      );
+    };
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <View
+      style={[
+        styles.tabbar,
+        {
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
+    >
+      {props.navigationState.routes.map((route: any, index: number) => {
+        return (
+          <TouchableWithoutFeedback
+            key={route.key}
+            onPress={() => props.jumpTo(route.key)}
+          >
+            {renderItem(props)({
+              route,
+              index,
+            })}
+          </TouchableWithoutFeedback>
+        );
+      })}
+    </View>
+  );
+
+  return (
+    <TabView
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      tabBarPosition="bottom"
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+CustomTabBar.options = {
+  title: "Custom tab bar",
+};
+
+export default CustomTabBar;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#fafafa",
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(0, 0, 0, .2)",
+  },
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 4.5,
+  },
+  activeItem: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  active: {
+    color: "#0084ff",
+  },
+  inactive: {
+    color: "#939393",
+  },
+  icon: {
+    height: 26,
+    width: 26,
+  },
+  label: {
+    fontSize: 10,
+    marginTop: 3,
+    marginBottom: 1.5,
+    backgroundColor: "transparent",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/Coverflow.tsx should 1`] = `
+"/* eslint-disable import/no-commonjs */
+import {
+  Animated,
+  Image,
+  ImageRequireSource,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SceneRendererProps, TabView } from "react-native-tab-view";
+
+const ALBUMS: {
+  [key: string]: ImageRequireSource;
+} = {
+  "Abbey Road": require("../../../assets/album-art-01.jpg"),
+  "Bat Out of Hell": require("../../../assets/album-art-02.jpg"),
+  Homogenic: require("../../../assets/album-art-03.jpg"),
+  "Number of the Beast": require("../../../assets/album-art-04.jpg"),
+  "It's Blitz": require("../../../assets/album-art-05.jpg"),
+  "The Man-Machine": require("../../../assets/album-art-06.jpg"),
+  "The Score": require("../../../assets/album-art-07.jpg"),
+  "Lost Horizons": require("../../../assets/album-art-08.jpg"),
+};
+
+const Scene = ({ route }: any) => {
+  const coverflowStyle: any;
+
+  return (
+    <Animated.View style={[styles.page, coverflowStyle]}>
+      <View style={styles.album}>
+        <Image source={ALBUMS[route.key]} style={styles.cover} />
+      </View>
+      <Text style={styles.label}>{route.key}</Text>
+    </Animated.View>
+  );
+};
+
+export default function Coverflow() {
+  const [index, onIndexChange];
+  const [routes];
+
+  return (
+    <TabView
+      style={styles.container}
+      sceneContainerStyle={styles.scene}
+      offscreenPageLimit={3}
+      navigationState={{
+        index,
+        routes,
+      }}
+      onIndexChange={onIndexChange}
+      renderTabBar={() => null}
+      renderScene={(
+        props: SceneRendererProps & {
+          route: any;
+        },
+      ) => (
+        <Scene
+          {...props}
+          index={routes.indexOf(props.route)}
+          length={routes.length}
+        />
+      )}
+    />
+  );
+}
+
+Coverflow.options = {
+  title: "Coverflow",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#000",
+  },
+};
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#000",
+  },
+  scene: {
+    overflow: "visible",
+  },
+  page: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  album: {
+    backgroundColor: "#000",
+    width: 200,
+    height: 200,
+    elevation: 12,
+    shadowColor: "#000000",
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    shadowOffset: {
+      height: 8,
+      width: 0,
+    },
+  },
+  cover: {
+    width: 200,
+    height: 200,
+  },
+  label: {
+    margin: 16,
+    color: "#fff",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/ScrollableTabBar.tsx should 1`] = `
+"import { StyleSheet } from "react-native";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  albums: () => <Albums />,
+  contacts: () => <Contacts />,
+  article: () => <Article />,
+  chat: () => <Chat bottom />,
+});
+
+const ScrollableTabBar = () => {
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <TabBar
+      {...props}
+      scrollEnabled
+      indicatorStyle={styles.indicator}
+      style={styles.tabbar}
+      tabStyle={styles.tab}
+      labelStyle={styles.label}
+    />
+  );
+
+  return (
+    <TabView
+      lazy
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+ScrollableTabBar.options = {
+  title: "Scrollable tab bar",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#3f51b5",
+  },
+};
+
+export default ScrollableTabBar;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: "#3f51b5",
+  },
+  tab: {
+    width: 120,
+  },
+  indicator: {
+    backgroundColor: "#ffeb3b",
+  },
+  label: {
+    fontWeight: "400",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/TabBarIcon.tsx should 1`] = `
+"import { StyleSheet } from "react-native";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  chat: () => <Chat bottom />,
+  contacts: () => <Contacts />,
+  article: () => <Article />,
+});
+
+const TabBarIcon = () => {
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderIcon = ({ route, color }: { route: any; color: string }) => (
+    <Ionicons name={route.icon} size={24} color={color} />
+  );
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <TabBar
+      {...props}
+      indicatorStyle={styles.indicator}
+      renderIcon={renderIcon}
+      style={styles.tabbar}
+    />
+  );
+
+  return (
+    <TabView
+      lazy
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+TabBarIcon.options = {
+  title: "Top tab bar with icons",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#e91e63",
+  },
+};
+
+export default TabBarIcon;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: "#e91e63",
+  },
+  indicator: {
+    backgroundColor: "#ffeb3b",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/AutoWidthTabBar.tsx should 1`] = `
+"import { StyleSheet } from "react-native";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  albums: () => <Albums />,
+  contacts: () => <Contacts />,
+  article: () => <Article />,
+  chat: () => <Chat bottom />,
+  long: () => <Article />,
+  medium: () => <Article />,
+});
+
+const AutoWidthTabBar = () => {
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <TabBar
+      {...props}
+      scrollEnabled
+      indicatorStyle={styles.indicator}
+      style={styles.tabbar}
+      labelStyle={styles.label}
+      tabStyle={styles.tabStyle}
+    />
+  );
+
+  return (
+    <TabView
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+AutoWidthTabBar.options = {
+  title: "Scrollable tab bar (auto width)",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#3f51b5",
+  },
+};
+
+export default AutoWidthTabBar;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: "#3f51b5",
+  },
+  indicator: {
+    backgroundColor: "#ffeb3b",
+  },
+  label: {
+    fontWeight: "400",
+  },
+  tabStyle: {
+    width: "auto",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx should 1`] = `
+"import { Animated, I18nManager, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  article: () => <Article />,
+  contacts: () => <Contacts />,
+  albums: () => <Albums />,
+});
+
+const CustomIndicator = () => {
+  const insets = useSafeAreaInsets();
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderIndicator = (
+    props: SceneRendererProps & {
+      navigationState: any;
+      getTabWidth: (i: number) => number;
+    },
+  ) => {
+    const { position, navigationState, getTabWidth } = props;
+    const inputRange = [
+      0, 0.48, 0.49, 0.51, 0.52, 1, 1.48, 1.49, 1.51, 1.52, 2,
+    ];
+
+    const scale = position.interpolate({
+      inputRange,
+      outputRange: inputRange.map((x) => (Math.trunc(x) === x ? 2 : 0.1)),
+    });
+
+    const opacity = position.interpolate({
+      inputRange,
+      outputRange: inputRange.map((x) => {
+        const d = x - Math.trunc(x);
+        return d === 0.49 || d === 0.51 ? 0 : 1;
+      }),
+    });
+
+    const translateX = position.interpolate({
+      inputRange: inputRange,
+      outputRange: inputRange.map((x) => {
+        const i = Math.round(x);
+        return i * getTabWidth(i) * (I18nManager.isRTL ? -1 : 1);
+      }),
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            width: \`${100 / navigationState.routes.length}%\`,
+            transform: [
+              {
+                translateX,
+              },
+            ] as any,
+          },
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.indicator,
+            {
+              opacity,
+              transform: [
+                {
+                  scale,
+                },
+              ],
+            } as any,
+          ]}
+        />
+      </Animated.View>
+    );
+  };
+
+  const renderIcon = ({ route }: { route: any }) => (
+    <Ionicons name={route.icon} size={24} style={styles.icon} />
+  );
+
+  const renderBadge = ({ route }: { route: any }) => {
+    if (route.key === "albums") {
+      return (
+        <View style={styles.badge}>
+          <Text style={styles.count}>42</Text>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <View
+      style={[
+        styles.tabbar,
+        {
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
+      <TabBar
+        {...props}
+        renderIcon={renderIcon}
+        renderBadge={renderBadge}
+        renderIndicator={renderIndicator}
+        style={styles.tabbar}
+      />
+    </View>
+  );
+
+  return (
+    <TabView
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      tabBarPosition="bottom"
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+CustomIndicator.options = {
+  title: "Custom indicator",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#263238",
+  },
+};
+
+export default CustomIndicator;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: "#263238",
+    overflow: "hidden",
+  },
+  icon: {
+    backgroundColor: "transparent",
+    color: "white",
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  indicator: {
+    backgroundColor: "rgb(0, 132, 255)",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    margin: 6,
+  },
+  badge: {
+    marginTop: 4,
+    marginRight: 32,
+    backgroundColor: "#f44336",
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  count: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: -2,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/Contacts.tsx should 1`] = `
+"import { useScrollToTop, useTheme } from "@react-navigation/native";
+import { FlatList, StyleSheet, View } from "react-native";
+
+const CONTACTS: any[] = [
+  {
+    name: "Marissa Castillo",
+    number: 7766398169,
+  },
+  {
+    name: "Denzel Curry",
+    number: 9394378449,
+  },
+  {
+    name: "Miles Ferguson",
+    number: 8966872888,
+  },
+  {
+    name: "Desiree Webster",
+    number: 6818656371,
+  },
+  {
+    name: "Samantha Young",
+    number: 6538288534,
+  },
+  {
+    name: "Irene Hunter",
+    number: 2932176249,
+  },
+  {
+    name: "Annie Ryan",
+    number: 4718456627,
+  },
+  {
+    name: "Sasha Oliver",
+    number: 9743195919,
+  },
+  {
+    name: "Jarrod Avila",
+    number: 8339212305,
+  },
+  {
+    name: "Griffin Weaver",
+    number: 6059349721,
+  },
+  {
+    name: "Emilee Moss",
+    number: 7382905180,
+  },
+  {
+    name: "Angelique Oliver",
+    number: 9689298436,
+  },
+  {
+    name: "Emanuel Little",
+    number: 6673376805,
+  },
+  {
+    name: "Wayne Day",
+    number: 6918839582,
+  },
+  {
+    name: "Lauren Reese",
+    number: 4652613201,
+  },
+  {
+    name: "Kailey Ward",
+    number: 2232609512,
+  },
+  {
+    name: "Gabrielle Newman",
+    number: 2837997127,
+  },
+  {
+    name: "Luke Strickland",
+    number: 8404732322,
+  },
+  {
+    name: "Payton Garza",
+    number: 7916140875,
+  },
+  {
+    name: "Anna Moss",
+    number: 3504954657,
+  },
+  {
+    name: "Kailey Vazquez",
+    number: 3002136330,
+  },
+  {
+    name: "Jennifer Coleman",
+    number: 5469629753,
+  },
+  {
+    name: "Cindy Casey",
+    number: 8446175026,
+  },
+  {
+    name: "Dillon Doyle",
+    number: 5614510703,
+  },
+  {
+    name: "Savannah Garcia",
+    number: 5634775094,
+  },
+  {
+    name: "Kailey Hudson",
+    number: 3289239675,
+  },
+  {
+    name: "Ariel Green",
+    number: 2103492196,
+  },
+  {
+    name: "Weston Perez",
+    number: 2984221823,
+  },
+  {
+    name: "Kari Juarez",
+    number: 9502125065,
+  },
+  {
+    name: "Sara Sanders",
+    number: 7696668206,
+  },
+  {
+    name: "Griffin Le",
+    number: 3396937040,
+  },
+  {
+    name: "Fernando Valdez",
+    number: 9124257306,
+  },
+  {
+    name: "Taylor Marshall",
+    number: 9656072372,
+  },
+  {
+    name: "Elias Dunn",
+    number: 9738536473,
+  },
+  {
+    name: "Diane Barrett",
+    number: 6886824829,
+  },
+  {
+    name: "Samuel Freeman",
+    number: 5523948094,
+  },
+  {
+    name: "Irene Garza",
+    number: 2077694008,
+  },
+  {
+    name: "Devante Alvarez",
+    number: 9897002645,
+  },
+  {
+    name: "Sydney Floyd",
+    number: 6462897254,
+  },
+  {
+    name: "Toni Dixon",
+    number: 3775448213,
+  },
+  {
+    name: "Anastasia Spencer",
+    number: 4548212752,
+  },
+  {
+    name: "Reid Cortez",
+    number: 6668056507,
+  },
+  {
+    name: "Ramon Duncan",
+    number: 8889157751,
+  },
+  {
+    name: "Kenny Moreno",
+    number: 5748219540,
+  },
+  {
+    name: "Shelby Craig",
+    number: 9473708675,
+  },
+  {
+    name: "Jordyn Brewer",
+    number: 7552277991,
+  },
+  {
+    name: "Tanya Walker",
+    number: 4308189657,
+  },
+  {
+    name: "Nolan Figueroa",
+    number: 9173443776,
+  },
+  {
+    name: "Sophia Gibbs",
+    number: 6435942770,
+  },
+  {
+    name: "Vincent Sandoval",
+    number: 2606111495,
+  },
+];
+
+const ContactItem;
+
+const ItemSeparator = () => {
+  const { colors } = useTheme();
+
+  return (
+    <View
+      style={[
+        styles.separator,
+        {
+          backgroundColor: colors.border,
+        },
+      ]}
+    />
+  );
+};
+
+export default function Contacts() {
+  const ref;
+
+  useScrollToTop(ref);
+
+  const renderItem = ({ item }: { item: any }) => <ContactItem item={item} />;
+
+  return (
+    <FlatList
+      ref={ref}
+      data={CONTACTS}
+      keyExtractor={(_, i) => String(i)}
+      renderItem={renderItem}
+      ItemSeparatorComponent={ItemSeparator}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 8,
+  },
+  avatar: {
+    height: 36,
+    width: 36,
+    borderRadius: 18,
+    backgroundColor: "#e91e63",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  letter: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  details: {
+    margin: 8,
+  },
+  name: {
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  number: {
+    fontSize: 12,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/Albums.tsx should 1`] = `
+"/* eslint-disable import/no-commonjs */
+import { useScrollToTop } from "@react-navigation/native";
+import {
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+
+const COVERS = [
+  require("../../assets/album-art-01.jpg"),
+  require("../../assets/album-art-02.jpg"),
+  require("../../assets/album-art-03.jpg"),
+  require("../../assets/album-art-04.jpg"),
+  require("../../assets/album-art-05.jpg"),
+  require("../../assets/album-art-06.jpg"),
+  require("../../assets/album-art-07.jpg"),
+  require("../../assets/album-art-08.jpg"),
+  require("../../assets/album-art-09.jpg"),
+  require("../../assets/album-art-10.jpg"),
+  require("../../assets/album-art-11.jpg"),
+  require("../../assets/album-art-12.jpg"),
+  require("../../assets/album-art-13.jpg"),
+  require("../../assets/album-art-14.jpg"),
+  require("../../assets/album-art-15.jpg"),
+  require("../../assets/album-art-16.jpg"),
+  require("../../assets/album-art-17.jpg"),
+  require("../../assets/album-art-18.jpg"),
+  require("../../assets/album-art-19.jpg"),
+  require("../../assets/album-art-20.jpg"),
+  require("../../assets/album-art-21.jpg"),
+  require("../../assets/album-art-22.jpg"),
+  require("../../assets/album-art-23.jpg"),
+  require("../../assets/album-art-24.jpg"),
+];
+
+export default function Albums(props: any) {
+  const dimensions = useWindowDimensions();
+
+  const ref;
+
+  useScrollToTop(ref);
+
+  const itemSize = dimensions.width / Math.floor(dimensions.width / 150);
+
+  return (
+    <ScrollView ref={ref} contentContainerStyle={styles.content} {...props}>
+      {COVERS.map((source, i) => (
+        <View
+          // eslint-disable-next-line react/no-array-index-key
+          // eslint-disable-next-line react/no-array-index-key
+
+          key={i}
+          style={[
+            styles.item,
+            Platform.OS !== "web" && {
+              height: itemSize,
+              width: itemSize,
+            },
+          ]}
+        >
+          <Image source={source} style={styles.photo} />
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  ...Platform.select({
+    web: {
+      content: {
+        display: "grid" as "none",
+        gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+      },
+      item: {
+        width: "100%",
+      },
+    },
+    default: {
+      content: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+      },
+    },
+  }),
+  photo: {
+    flex: 1,
+    resizeMode: "cover",
+    paddingTop: "100%",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/Chat.tsx should 1`] = `
+"import { useScrollToTop, useTheme } from "@react-navigation/native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const MESSAGES = [
+  "okay",
+  "sudo make me a sandwich",
+  "what? make it yourself",
+  "make me a sandwich",
+];
+
+export default function Chat({ bottom, ...rest }: any) {
+  const insets = useSafeAreaInsets();
+  const ref;
+
+  useScrollToTop(ref);
+
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.inverted}
+        contentContainerStyle={styles.content}
+        {...rest}
+      >
+        {MESSAGES.map((text, i) => {
+          const odd = i % 2;
+
+          return (
+            <View
+              // eslint-disable-next-line react/no-array-index-key
+              // eslint-disable-next-line react/no-array-index-key
+
+              key={i}
+              style={[odd ? styles.odd : styles.even, styles.inverted]}
+            >
+              <Image
+                style={styles.avatar}
+                source={
+                  odd
+                    ? require("../../assets/avatar-2.png")
+                    : require("../../assets/avatar-1.png")
+                }
+              />
+              <View
+                style={[
+                  styles.bubble,
+                  {
+                    backgroundColor: odd ? colors.primary : colors.card,
+                  },
+                ]}
+              >
+                <Text
+                  style={{
+                    color: odd ? "white" : colors.text,
+                  }}
+                >
+                  {text}
+                </Text>
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            color: colors.text,
+          },
+        ]}
+        placeholderTextColor={Color(colors.text).alpha(0.5).rgb().string()}
+        placeholder="Write a message"
+        underlineColorAndroid="transparent"
+      />
+      {bottom ? (
+        <View
+          style={[
+            styles.spacer,
+            {
+              height: insets.bottom,
+            },
+          ]}
+        />
+      ) : null}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  inverted: {
+    transform: [
+      {
+        scaleY: -1,
+      },
+    ],
+  },
+  content: {
+    padding: 16,
+  },
+  even: {
+    flexDirection: "row",
+  },
+  odd: {
+    flexDirection: "row-reverse",
+  },
+  avatar: {
+    marginVertical: 8,
+    marginHorizontal: 6,
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    borderColor: "rgba(0, 0, 0, .16)",
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  bubble: {
+    marginVertical: 8,
+    marginHorizontal: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+  input: {
+    height: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  spacer: {
+    backgroundColor: "#fff",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/Article.tsx should 1`] = `
+"import { useScrollToTop, useTheme } from "@react-navigation/native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextProps,
+  View,
+} from "react-native";
+
+const Heading = ({
+  style,
+  ...rest
+}: TextProps & {
+  children: React.ReactNode;
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <Text
+      style={[
+        styles.heading,
+        {
+          color: colors.text,
+        },
+        style,
+      ]}
+      {...rest}
+    />
+  );
+};
+
+const Paragraph = ({
+  style,
+  ...rest
+}: TextProps & {
+  children: React.ReactNode;
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <Text
+      style={[
+        styles.paragraph,
+        {
+          color: colors.text,
+        },
+        style,
+      ]}
+      {...rest}
+    />
+  );
+};
+
+export default function Article({
+  date = "1st Jan 2025",
+  author = {
+    name: "Knowledge Bot",
+  },
+  ...rest
+}: any) {
+  const ref;
+
+  useScrollToTop(ref);
+
+  const { colors } = useTheme();
+
+  return (
+    <ScrollView
+      ref={ref}
+      style={{
+        backgroundColor: colors.card,
+      }}
+      contentContainerStyle={styles.content}
+      {...rest}
+    >
+      <View style={styles.author}>
+        <Image
+          style={styles.avatar}
+          source={require("../../assets/avatar-1.png")}
+        />
+        <View style={styles.meta}>
+          <Text
+            style={[
+              styles.name,
+              {
+                color: colors.text,
+              },
+            ]}
+          >
+            {author.name}
+          </Text>
+          <Text
+            style={[
+              styles.timestamp,
+              {
+                color: colors.text,
+              },
+            ]}
+          >
+            {date}
+          </Text>
+        </View>
+      </View>
+      <Heading>What is Lorem Ipsum?</Heading>
+      <Paragraph>
+        Lorem Ipsum is simply dummy text of the printing and typesetting
+        industry. Lorem Ipsum has been the industry's standard dummy text ever
+        since the 1500s, when an unknown printer took a galley of type and
+        scrambled it to make a type specimen book. It has survived not only five
+        centuries, but also the leap into electronic typesetting, remaining
+        essentially unchanged. It was popularised in the 1960s with the release
+        of Letraset sheets containing Lorem Ipsum passages, and more recently
+        with desktop publishing software like Aldus PageMaker including versions
+        of Lorem Ipsum.
+      </Paragraph>
+      <Image style={styles.image} source={require("../../assets/book.jpg")} />
+      <Heading>Where does it come from?</Heading>
+      <Paragraph>
+        Contrary to popular belief, Lorem Ipsum is not simply random text. It
+        has roots in a piece of classical Latin literature from 45 BC, making it
+        over 2000 years old. Richard McClintock, a Latin professor at
+        Hampden-Sydney College in Virginia, looked up one of the more obscure
+        Latin words, consectetur, from a Lorem Ipsum passage, and going through
+        the cites of the word in classical literature, discovered the
+        undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33
+        of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by
+        Cicero, written in 45 BC. This book is a treatise on the theory of
+        ethics, very popular during the Renaissance. The first line of Lorem
+        Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section
+        1.10.32.
+      </Paragraph>
+      <Paragraph>
+        The standard chunk of Lorem Ipsum used since the 1500s is reproduced
+        below for those interested. Sections 1.10.32 and 1.10.33 from "de
+        Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact
+        original form, accompanied by English versions from the 1914 translation
+        by H. Rackham.
+      </Paragraph>
+      <Heading>Why do we use it?</Heading>
+      <Paragraph>
+        It is a long established fact that a reader will be distracted by the
+        readable content of a page when looking at its layout. The point of
+        using Lorem Ipsum is that it has a more-or-less normal distribution of
+        letters, as opposed to using "Content here, content here", making it
+        look like readable English. Many desktop publishing packages and web
+        page editors now use Lorem Ipsum as their default model text, and a
+        search for "lorem ipsum" will uncover many web sites still in their
+        infancy. Various versions have evolved over the years, sometimes by
+        accident, sometimes on purpose (injected humour and the like).
+      </Paragraph>
+      <Heading>Where can I get some?</Heading>
+      <Paragraph>
+        There are many variations of passages of Lorem Ipsum available, but the
+        majority have suffered alteration in some form, by injected humour, or
+        randomised words which don't look even slightly believable. If you are
+        going to use a passage of Lorem Ipsum, you need to be sure there isn't
+        anything embarrassing hidden in the middle of text. All the Lorem Ipsum
+        generators on the Internet tend to repeat predefined chunks as
+        necessary, making this the first true generator on the Internet. It uses
+        a dictionary of over 200 Latin words, combined with a handful of model
+        sentence structures, to generate Lorem Ipsum which looks reasonable. The
+        generated Lorem Ipsum is therefore always free from repetition, injected
+        humour, or non-characteristic words etc.
+      </Paragraph>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {
+    paddingVertical: 16,
+  },
+  author: {
+    flexDirection: "row",
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  meta: {
+    marginHorizontal: 8,
+    justifyContent: "center",
+  },
+  name: {
+    fontWeight: "bold",
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  timestamp: {
+    opacity: 0.5,
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  avatar: {
+    height: 48,
+    width: 48,
+    borderRadius: 24,
+  },
+  heading: {
+    fontWeight: "bold",
+    fontSize: 24,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  paragraph: {
+    fontSize: 16,
+    lineHeight: 24,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
+    marginVertical: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/BlurView.native.tsx should 1`] = `
+"export default BlurView;
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/SettingsItem.tsx should 1`] = `
+"import { View } from "react-native";
+import { Subheading, Switch } from "react-native-paper";
+
+export default function SettingsItem({ label, value, onValueChange }: any) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+      }}
+    >
+      <Subheading>{label}</Subheading>
+      <Switch value={value} onValueChange={onValueChange} />
+    </View>
+  );
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/NewsFeed.tsx should 1`] = `
+"import { useScrollToTop, useTheme } from "@react-navigation/native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import {
+  Avatar,
+  Card,
+  Divider,
+  IconButton,
+  Subheading,
+} from "react-native-paper";
+
+const Author = () => {
+  return (
+    <View style={[styles.row, styles.attribution]}>
+      <Avatar.Image source={require("../../assets/avatar-1.png")} size={32} />
+      <Subheading style={styles.author}>Joke bot</Subheading>
+    </View>
+  );
+};
+
+const Footer = () => {
+  return (
+    <View style={styles.row}>
+      <IconButton style={styles.icon} size={16} icon="heart-outline" />
+      <IconButton style={styles.icon} size={16} icon="comment-outline" />
+      <IconButton style={styles.icon} size={16} icon="share-outline" />
+    </View>
+  );
+};
+
+export default function NewsFeed(props: any) {
+  const ref;
+
+  useScrollToTop(ref);
+
+  const { colors } = useTheme();
+
+  return (
+    <ScrollView ref={ref} {...props}>
+      <Card style={styles.card}>
+        <TextInput
+          placeholder="What's on your mind?"
+          placeholderTextColor={Color(colors.text).alpha(0.5).rgb().string()}
+          style={styles.input}
+        />
+      </Card>
+      <Card style={styles.card}>
+        <Author />
+        <Card.Content style={styles.content}>
+          <Text>
+            If you aren't impressed with the picture of the first Black Hole,
+            you clearly don't understand the gravity of the situation.
+          </Text>
+        </Card.Content>
+        <Divider />
+        <Footer />
+      </Card>
+      <Card style={styles.card}>
+        <Author />
+        <Card.Content style={styles.content}>
+          <Text>
+            I went to the zoo and I saw a baguette in a cage. I asked the
+            zookeeper about it and he said it was bread in captivity.
+          </Text>
+        </Card.Content>
+        <Image source={require("../../assets/book.jpg")} style={styles.cover} />
+        <Footer />
+      </Card>
+      <Card style={styles.card}>
+        <Author />
+        <Card.Content style={styles.content}>
+          <Text>Why didn't 4 ask 5 out? Because he was 2².</Text>
+        </Card.Content>
+        <Divider />
+        <Footer />
+      </Card>
+      <Card style={styles.card}>
+        <Author />
+        <Card.Content style={styles.content}>
+          <Text>
+            What did Master Yoda say when he first saw himself in 4k? HDMI.
+          </Text>
+        </Card.Content>
+        <Divider />
+        <Footer />
+      </Card>
+      <Card style={styles.card}>
+        <Author />
+        <Card.Content style={styles.content}>
+          <Text>
+            Someone broke into my house and stole 20% of my couch. Ouch!
+          </Text>
+        </Card.Content>
+        <Divider />
+        <Footer />
+      </Card>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  input: {
+    padding: 16,
+    backgroundColor: "transparent",
+    margin: 0,
+  },
+  card: {
+    marginVertical: 8,
+    borderRadius: 0,
+  },
+  cover: {
+    height: 160,
+    borderRadius: 0,
+  },
+  content: {
+    marginBottom: 12,
+  },
+  attribution: {
+    margin: 12,
+  },
+  author: {
+    marginHorizontal: 8,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    flex: 1,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Shared/BlurView.tsx should 1`] = `
+"import { View, ViewProps } from "react-native";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function BlurView({ tint, intensity, ...rest }: any) {
+  return <View {...rest} />;
+}
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/index.tsx should 1`] = `
+"import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  useFlipper,
+  useReduxDevToolsExtension,
+} from "@react-navigation/devtools";
+import {
+  createDrawerNavigator,
+  DrawerScreenProps,
+} from "@react-navigation/drawer";
+import {
+  CompositeScreenProps,
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  PathConfigMap,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  HeaderStyleInterpolators,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import {
+  I18nManager,
+  LogBox,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  useWindowDimensions,
+} from "react-native";
+import { Divider, List, Provider as PaperProvider } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
+if (Platform.OS !== "web") {
+  LogBox.ignoreLogs(["Require cycle:"]);
+}
+
+const Drawer = createDrawerNavigator<any>();
+const Stack = createStackNavigator<any>();
+
+const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE";
+const THEME_PERSISTENCE_KEY = "THEME_TYPE";
+
+const SCREEN_NAMES = Object.keys(SCREENS) as keyof (typeof SCREENS)[];
+
+export default function App() {
+  const [theme, setTheme];
+
+  const [isReady];
+  const [initialState];
+
+  const paperTheme;
+
+  const dimensions = useWindowDimensions();
+
+  const navigationRef = useNavigationContainerRef();
+
+  useReduxDevToolsExtension(navigationRef);
+  useFlipper(navigationRef);
+
+  if (!isReady) {
+    return null;
+  }
+
+  const isLargeScreen = dimensions.width >= 1024;
+
+  return (
+    <Providers theme={paperTheme}>
+      <StatusBar
+        translucent
+        barStyle={theme.dark ? "light-content" : "dark-content"}
+        backgroundColor="rgba(0, 0, 0, 0.24)"
+      />
+      <NavigationContainer
+        ref={navigationRef}
+        initialState={initialState}
+        onStateChange={(state) =>
+          AsyncStorage?.setItem(
+            NAVIGATION_PERSISTENCE_KEY,
+            JSON.stringify(state),
+          )
+        }
+        theme={theme}
+        linking={{
+          // To test deep linking on, run the following in the Terminal:
+          // Android: adb shell am start -a android.intent.action.VIEW -d "exp://127.0.0.1:19000/--/simple-stack"
+          // iOS: xcrun simctl openurl booted exp://127.0.0.1:19000/--/simple-stack
+          // Android (bare): adb shell am start -a android.intent.action.VIEW -d "rne://127.0.0.1:19000/--/simple-stack"
+          // iOS (bare): xcrun simctl openurl booted rne://127.0.0.1:19000/--/simple-stack
+          // The first segment of the link is the the scheme + host (returned by \`Linking.makeUrl\`)
+          prefixes: [createURL("/")],
+          config: {
+            initialRouteName: "Home",
+            screens: SCREEN_NAMES.reduce<PathConfigMap<any>>(
+              (acc, name) => {
+                // Convert screen names such as SimpleStack to kebab case (simple-stack)
+                const path = name
+                  .replace(/([A-Z]+)/g, "-$1")
+                  .replace(/^-/, "")
+                  .toLowerCase();
+
+                acc[name] = {
+                  path,
+                  screens: {
+                    Article: {
+                      path: "article/:author?",
+                      parse: {
+                        author: (author: string) =>
+                          author.charAt(0).toUpperCase() +
+                          author.slice(1).replace(/-/g, " "),
+                      },
+                      stringify: {
+                        author: (author: string) =>
+                          author.toLowerCase().replace(/\s/g, "-"),
+                      },
+                    },
+                    Albums: "music",
+                    Chat: "chat",
+                    Contacts: "people",
+                    NewsFeed: "feed",
+                    Dialog: "dialog",
+                  },
+                };
+
+                return acc;
+              },
+              {
+                Home: {
+                  screens: {
+                    Examples: "",
+                  },
+                },
+                NotFound: "*",
+              },
+            ),
+          },
+        }}
+        fallback={<Text>Loading…</Text>}
+        documentTitle={{
+          formatter: (options, route) =>
+            \`${options?.title ?? route?.name} - React Navigation Example\`,
+        }}
+      >
+        <Stack.Navigator
+          screenOptions={{
+            headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            options={{
+              headerShown: false,
+            }}
+          >
+            {() => (
+              <Drawer.Navigator
+                screenOptions={{
+                  drawerType: isLargeScreen ? "permanent" : undefined,
+                  overlayAccessibilityLabel: "Close drawer",
+                }}
+              >
+                <Drawer.Screen
+                  name="Examples"
+                  options={{
+                    title: "Examples",
+                    drawerIcon: ({ size, color }) => (
+                      <MaterialIcons size={size} color={color} name="folder" />
+                    ),
+                  }}
+                >
+                  {({
+                    navigation,
+                  }: CompositeScreenProps<
+                    DrawerScreenProps<any, "Examples">,
+                    StackScreenProps<any>
+                  >) => (
+                    <ScrollView
+                      style={{
+                        backgroundColor: theme.colors.background,
+                      }}
+                    >
+                      <SafeAreaView edges={["right", "bottom", "left"]}>
+                        <SettingsItem
+                          label="Right to left"
+                          value={I18nManager.getConstants().isRTL}
+                          onValueChange={() => {
+                            I18nManager.forceRTL(
+                              !I18nManager.getConstants().isRTL,
+                            );
+                          }}
+                        />
+                        <Divider />
+                        <SettingsItem
+                          label="Dark theme"
+                          value={theme.dark}
+                          onValueChange={() => {
+                            AsyncStorage?.setItem(
+                              THEME_PERSISTENCE_KEY,
+                              theme.dark ? "light" : "dark",
+                            );
+
+                            setTheme((t) =>
+                              t.dark ? DefaultTheme : DarkTheme,
+                            );
+                          }}
+                        />
+                        <Divider />
+                        {SCREEN_NAMES.map((name) => (
+                          <List.Item
+                            key={name}
+                            testID={name}
+                            title={SCREENS[name].title}
+                            onPress={() => {
+                              navigation.navigate(name);
+                            }}
+                          />
+                        ))}
+                      </SafeAreaView>
+                    </ScrollView>
+                  )}
+                </Drawer.Screen>
+              </Drawer.Navigator>
+            )}
+          </Stack.Screen>
+          <Stack.Screen
+            name="NotFound"
+            component={NotFound}
+            options={{
+              title: "Oops!",
+            }}
+          />
+          {SCREEN_NAMES.map((name) => (
+            <Stack.Screen
+              key={name}
+              name={name}
+              getComponent={() => SCREENS[name].component}
+              options={{
+                title: SCREENS[name].title,
+              }}
+            />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Providers>
+  );
+}
+
+const Providers = ({
+  theme,
+  children,
+}: {
+  theme: ReactNativePaper.Theme;
+  children: React.ReactNode;
+}) => {
+  return (
+    <PaperProvider theme={theme}>
+      <ActionSheetProvider>
+        <>{children}</>
+      </ActionSheetProvider>
+    </PaperProvider>
+  );
+};
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import {
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Appbar, Button } from "react-native-paper";
+
+export type NativeStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push Albums
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({
+  navigation,
+}: NativeStackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.navigate("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Navigate to article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const NativeStack = createNativeStackNavigator<any>();
+
+export default function NativeStackScreen({}: NativeStackScreenProps<ParamListBase>) {
+  const onPress = () => {
+    Alert.alert(
+      "Never gonna give you up!",
+      "Never gonna let you down! Never gonna run around and desert you!",
+    );
+  };
+
+  return (
+    <NativeStack.Navigator>
+      <NativeStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route, navigation }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          headerTintColor: "white",
+          headerTitle: ({ tintColor }) => (
+            <Appbar.Action
+              color={tintColor}
+              icon="signal-5g"
+              onPress={onPress}
+            />
+          ),
+          headerLeft: ({ tintColor, canGoBack }) =>
+            canGoBack ? (
+              <Appbar.Action
+                color={tintColor}
+                icon="arrow-left-thick"
+                onPress={navigation.goBack}
+              />
+            ) : null,
+          headerRight: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="music" onPress={onPress} />
+          ),
+          headerBackground: () => (
+            <Image
+              source={require("../../assets/cpu.jpg")}
+              style={styles.headerBackground}
+            />
+          ),
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <NativeStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+          headerLeft: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="spa" onPress={onPress} />
+          ),
+        }}
+      />
+      <NativeStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          headerTintColor: "tomato",
+          headerStyle: {
+            backgroundColor: "papayawhip",
+          },
+          headerBackVisible: true,
+          headerLeft: ({ tintColor }) => (
+            <Appbar.Action color={tintColor} icon="music" onPress={onPress} />
+          ),
+        }}
+      />
+    </NativeStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+  headerBackground: {
+    height: undefined,
+    width: undefined,
+    flex: 1,
+    resizeMode: "cover",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MixedStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() =>
+              navigation.push("Article", {
+                author: "Dalek",
+              })
+            }
+            style={styles.button}
+          >
+            Push article
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.goBack()}
+            style={styles.button}
+          >
+            Go back
+          </Button>
+        </View>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => navigation.push("Albums")}
+            style={styles.button}
+          >
+            Push album
+          </Button>
+        </View>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => navigation.push("Albums")}
+            style={styles.button}
+          >
+            Push album
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => navigation.goBack()}
+            style={styles.button}
+          >
+            Go back
+          </Button>
+        </View>
+        <View>
+          <Button
+            mode="contained"
+            onPress={() =>
+              navigation.push("Article", {
+                author: "The Doctor",
+              })
+            }
+            style={styles.button}
+          >
+            Push article
+          </Button>
+        </View>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const MixedStack = createStackNavigator<any>();
+
+export default function MixedStackScreen({}: any) {
+  return (
+    <MixedStack.Navigator>
+      <MixedStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <MixedStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          presentation: "modal",
+        }}
+      />
+    </MixedStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/ModalStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const ModalStack = createStackNavigator<any>();
+
+export default function ModalStackScreen({}: any) {
+  return (
+    <ModalStack.Navigator
+      screenOptions={{
+        presentation: "modal",
+      }}
+    >
+      <ModalStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <ModalStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </ModalStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/NativeStack.tsx should 1`] = `
+"import { useHeaderHeight } from "@react-navigation/elements";
+import type { ParamListBase } from "@react-navigation/native";
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type NativeStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.replace("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Replace with feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: NativeStackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push Albums
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({
+  navigation,
+}: NativeStackScreenProps<any, "Albums">) => {
+  const headerHeight = useHeaderHeight();
+
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        paddingTop: headerHeight,
+      }}
+    >
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.navigate("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Navigate to article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const NativeStack = createNativeStackNavigator<any>();
+
+export default function NativeStackScreen({}: NativeStackScreenProps<ParamListBase>) {
+  return (
+    <NativeStack.Navigator>
+      <NativeStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          headerLargeTitle: true,
+          headerLargeTitleShadowVisible: false,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <NativeStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+          fullScreenGestureEnabled: true,
+        }}
+      />
+      <NativeStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          presentation: "modal",
+          headerTransparent: true,
+          headerBlurEffect: "light",
+        }}
+      />
+    </NativeStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/DrawerView.tsx should 1`] = `
+"import { useActionSheet } from "@expo/react-native-action-sheet";
+import { useTheme } from "@react-navigation/native";
+import { StyleSheet, View } from "react-native";
+import { Drawer, useDrawerProgress } from "react-native-drawer-layout";
+import { Button, Text } from "react-native-paper";
+import Animated, {
+  interpolate,
+  isConfigured,
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+const RealDrawer = () => {
+  const progress = useDrawerProgress() as SharedValue<number>;
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(progress.value, [0, 1], [56, 0]),
+        },
+      ],
+    };
+  });
+
+  return (
+    <View style={styles.realDrawerWrapper}>
+      <Animated.View style={[styles.realDrawer, animatedStyle]} />
+    </View>
+  );
+};
+
+const DRAWER_TYPES = ["front", "back", "slide"] as any;
+
+export default function DrawerView() {
+  const { showActionSheetWithOptions } = useActionSheet();
+  const { colors } = useTheme();
+
+  const [open, setOpen];
+  const [legacy, setLegacy];
+
+  const [drawerType, setDrawerType];
+
+  const [drawerPosition, setDrawerPosition];
+
+  return (
+    <Drawer
+      useLegacyImplementation={legacy}
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      drawerType={drawerType}
+      drawerPosition={drawerPosition}
+      renderDrawerContent={() => {
+        return (
+          <View style={styles.container}>
+            <Button color="tomato" onPress={() => setOpen(false)}>
+              Close drawer
+            </Button>
+          </View>
+        );
+      }}
+    >
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        {!legacy && <RealDrawer />}
+        <View style={styles.buttons}>
+          <Button
+            mode="contained"
+            onPress={() => setOpen((prevOpen) => !prevOpen)}
+          >
+            {open ? "Close" : "Open"} drawer
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() =>
+              setDrawerPosition((prevPosition) =>
+                prevPosition === "left" ? "right" : "left",
+              )
+            }
+          >
+            Change position ({drawerPosition})
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() =>
+              showActionSheetWithOptions(
+                {
+                  options: DRAWER_TYPES.map((option) => {
+                    if (option === drawerType) {
+                      return \`${option} (current)\`;
+                    }
+
+                    return option;
+                  }),
+                },
+                (index) => {
+                  if (index != null) {
+                    setDrawerType(DRAWER_TYPES[index]);
+                  }
+                },
+              )
+            }
+          >
+            Change type ({drawerType})
+          </Button>
+          {isConfigured?.() ? (
+            <Button
+              mode="outlined"
+              onPress={() => setLegacy((prevLegacy) => !prevLegacy)}
+            >
+              Change Reanimated ({legacy ? 1 : 2})
+            </Button>
+          ) : (
+            <Text>Using Reanimated 1</Text>
+          )}
+        </View>
+      </View>
+    </Drawer>
+  );
+}
+
+DrawerView.title = "Drawer Layout";
+DrawerView.linking = {};
+DrawerView.options = {
+  headerShown: true,
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+  },
+  buttons: {
+    gap: 8,
+    alignItems: "center",
+  },
+  realDrawerWrapper: {
+    width: 64,
+    height: 72,
+    marginBottom: 8,
+    overflow: "hidden",
+  },
+  realDrawer: {
+    position: "absolute",
+    top: 0,
+    start: 0,
+    end: 8,
+    bottom: 0,
+    backgroundColor: "#ebdec1",
+    borderColor: "#3e3a3a",
+    borderWidth: 4,
+    borderBottomWidth: 0,
+    borderRadius: 2,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/MixedHeaderMode.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  HeaderStyleInterpolators,
+  StackScreenProps,
+  TransitionPresets,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type SimpleStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Push feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: StackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Navigate to album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({}: StackScreenProps<ParamListBase>) {
+  return (
+    <SimpleStack.Navigator
+      screenOptions={{
+        headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+      }}
+    >
+      <SimpleStack.Group
+        screenOptions={{
+          ...TransitionPresets.SlideFromRightIOS,
+          headerMode: "float",
+        }}
+      >
+        <SimpleStack.Screen
+          name="Article"
+          component={ArticleScreen}
+          options={({ route }) => ({
+            title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+          })}
+          initialParams={{
+            author: "Gandalf",
+          }}
+        />
+        <SimpleStack.Screen
+          name="NewsFeed"
+          component={NewsFeedScreen}
+          options={{
+            title: "Feed",
+          }}
+        />
+      </SimpleStack.Group>
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          ...TransitionPresets.ModalSlideFromBottomIOS,
+          headerMode: "screen",
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/LinkComponent.tsx should 1`] = `
+"import {
+  Link,
+  ParamListBase,
+  StackActions,
+  useLinkProps,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const LinkButton = ({
+  to,
+  ...rest
+}: React.ComponentProps<typeof Button> & any[0]) => {
+  const props = useLinkProps({
+    to,
+  });
+
+  return <Button {...props} {...rest} />;
+};
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Link
+          to={{
+            screen: "LinkComponent",
+            params: {
+              screen: "Albums",
+            },
+          }}
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Go to /link-component/music
+        </Link>
+        <Link
+          to="/link-component/music"
+          action={StackActions.replace("Albums")}
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Replace with /link-component/music
+        </Link>
+        <LinkButton
+          to="/link-component/music"
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /link-component/music
+        </LinkButton>
+        <LinkButton
+          to={{
+            screen: "Home",
+          }}
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /
+        </LinkButton>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Link
+          to="/link-component/article/babel"
+          style={[
+            styles.button,
+            {
+              padding: 8,
+            },
+          ]}
+        >
+          Go to /link-component/article
+        </Link>
+        <LinkButton
+          to="/link-component/article/babel"
+          mode="contained"
+          style={styles.button}
+        >
+          Go to /link-component/article
+        </LinkButton>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({ navigation, ...rest }: any) {
+  return (
+    <SimpleStack.Navigator {...rest}>
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params.author}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/SimpleStack.tsx should 1`] = `
+"import type { ParamListBase } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  StackNavigationOptions,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button } from "react-native-paper";
+
+export type SimpleStackParams = {
+  Article:
+    | {
+        author: string;
+      }
+    | undefined;
+  NewsFeed: {
+    date: number;
+  };
+  Albums: undefined;
+};
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.replace("NewsFeed", {
+              date: Date.now(),
+            })
+          }
+          style={styles.button}
+        >
+          Replace with feed
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() =>
+            navigation.setParams({
+              author:
+                route.params?.author === "Gandalf" ? "Babel fish" : "Gandalf",
+            })
+          }
+          style={styles.button}
+        >
+          Update params
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop()}
+          style={styles.button}
+        >
+          Pop screen
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params?.author ?? "Unknown",
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const NewsFeedScreen = ({
+  route,
+  navigation,
+}: StackScreenProps<any, "NewsFeed">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate("Albums")}
+          style={styles.button}
+        >
+          Navigate to album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <NewsFeed scrollEnabled={scrollEnabled} date={route.params.date} />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any, "Albums">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.pop(2)}
+          style={styles.button}
+        >
+          Pop by 2
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+export default function SimpleStackScreen({
+  screenOptions,
+}: StackScreenProps<ParamListBase> & {
+  screenOptions?: StackNavigationOptions;
+}) {
+  return (
+    <SimpleStack.Navigator screenOptions={screenOptions}>
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author ?? "Unknown"}\`,
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="NewsFeed"
+        component={NewsFeedScreen}
+        options={{
+          title: "Feed",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/StackHeaderCustomization.tsx should 1`] = `
+"import { HeaderBackground, useHeaderHeight } from "@react-navigation/elements";
+import { ParamListBase, useTheme } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  Header,
+  StackHeaderProps,
+  StackScreenProps,
+} from "@react-navigation/stack";
+import {
+  Alert,
+  Animated,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { Appbar, Button } from "react-native-paper";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+const scrollEnabled = Platform.select({
+  web: true,
+  default: false,
+});
+
+const ArticleScreen = ({
+  navigation,
+  route,
+}: StackScreenProps<any, "Article">) => {
+  return (
+    <ScrollView>
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() => navigation.push("Albums")}
+          style={styles.button}
+        >
+          Push album
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Article
+        author={{
+          name: route.params.author,
+        }}
+        scrollEnabled={scrollEnabled}
+      />
+    </ScrollView>
+  );
+};
+
+const AlbumsScreen = ({ navigation }: StackScreenProps<any>) => {
+  const headerHeight = useHeaderHeight();
+
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        paddingTop: headerHeight,
+      }}
+    >
+      <View style={styles.buttons}>
+        <Button
+          mode="contained"
+          onPress={() =>
+            navigation.push("Article", {
+              author: "Babel fish",
+            })
+          }
+          style={styles.button}
+        >
+          Push article
+        </Button>
+        <Button
+          mode="outlined"
+          onPress={() => navigation.goBack()}
+          style={styles.button}
+        >
+          Go back
+        </Button>
+      </View>
+      <Albums scrollEnabled={scrollEnabled} />
+    </ScrollView>
+  );
+};
+
+const SimpleStack = createStackNavigator<any>();
+
+function CustomHeader(props: StackHeaderProps) {
+  const { current, next } = props.progress;
+
+  const progress = Animated.add(current, next || 0);
+  const opacity = progress.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [0, 1, 0],
+  });
+
+  return (
+    <>
+      <Header {...props} />
+      <Animated.Text
+        style={[
+          styles.banner,
+          {
+            opacity,
+          },
+        ]}
+      >
+        Why hello there, pardner!
+      </Animated.Text>
+    </>
+  );
+}
+
+export default function HeaderCustomizationScreen({}: any) {
+  const { colors, dark } = useTheme();
+  const [headerTitleCentered, setHeaderTitleCentered];
+
+  return (
+    <SimpleStack.Navigator
+      screenOptions={{
+        headerMode: "float",
+      }}
+    >
+      <SimpleStack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={({ route }) => ({
+          title: \`Article by ${route.params?.author}\`,
+          header: (props) => <CustomHeader {...props} />,
+          headerTintColor: "#fff",
+          headerStyle: {
+            backgroundColor: "#ff005d",
+          },
+          headerBackTitleVisible: false,
+          headerTitleAlign: headerTitleCentered ? "center" : "left",
+          headerBackImage: ({ tintColor }) => (
+            <MaterialCommunityIcons
+              name="arrow-left-circle-outline"
+              color={tintColor}
+              size={24}
+              style={{
+                marginHorizontal: Platform.OS === "ios" ? 8 : 0,
+              }}
+            />
+          ),
+          headerRight: ({ tintColor }) => (
+            <Appbar.Action
+              color={tintColor}
+              icon="dots-horizontal-circle-outline"
+              onPress={() => {
+                setHeaderTitleCentered((centered) => !centered);
+                Alert.alert(
+                  "Never gonna give you up!",
+                  "Never gonna let you down! Never gonna run around and desert you!",
+                );
+              }}
+            />
+          ),
+        })}
+        initialParams={{
+          author: "Gandalf",
+        }}
+      />
+      <SimpleStack.Screen
+        name="Albums"
+        component={AlbumsScreen}
+        options={{
+          title: "Albums",
+          headerBackTitle: "Back",
+          headerTransparent: true,
+          headerBackground: () => (
+            <HeaderBackground
+              style={{
+                backgroundColor: "blue",
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderBottomColor: colors.border,
+              }}
+            >
+              <BlurView
+                tint={dark ? "dark" : "light"}
+                intensity={75}
+                style={StyleSheet.absoluteFill}
+              />
+            </HeaderBackground>
+          ),
+        }}
+      />
+    </SimpleStack.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 8,
+  },
+  button: {
+    margin: 8,
+  },
+  banner: {
+    textAlign: "center",
+    color: "tomato",
+    backgroundColor: "papayawhip",
+    padding: 4,
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/DynamicTabs.tsx should 1`] = `
+"import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { StyleSheet, View } from "react-native";
+import { Button, Title } from "react-native-paper";
+import Feather from "react-native-vector-icons/Feather";
+
+const BottomTabs = createBottomTabNavigator<any>();
+
+export default function BottomTabsScreen() {
+  const [tabs, setTabs];
+
+  return (
+    <BottomTabs.Navigator>
+      {tabs.map((i) => (
+        <BottomTabs.Screen
+          key={i}
+          name={\`tab-${i}\`}
+          options={{
+            title: \`Tab ${i}\`,
+            tabBarIcon: ({ color, size }) => (
+              <Feather name="octagon" color={color} size={size} />
+            ),
+          }}
+        >
+          {() => (
+            <View style={styles.container}>
+              <Title>Tab {i}</Title>
+              <Button onPress={() => setTabs((tabs) => [...tabs, tabs.length])}>
+                Add a tab
+              </Button>
+              <Button
+                onPress={() =>
+                  setTabs((tabs) =>
+                    tabs.length > 1 ? tabs.slice(0, -1) : tabs,
+                  )
+                }
+              >
+                Remove a tab
+              </Button>
+            </View>
+          )}
+        </BottomTabs.Screen>
+      ))}
+    </BottomTabs.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+"
+`;
+
+exports[`react-navigation example app submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx should 1`] = `
+"import { Animated, I18nManager, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  NavigationState,
+  SceneMap,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from "react-native-tab-view";
+
+const renderScene = SceneMap({
+  article: () => <Article />,
+  contacts: () => <Contacts />,
+  albums: () => <Albums />,
+});
+
+const CustomIndicator = () => {
+  const insets = useSafeAreaInsets();
+  const [index, onIndexChange];
+  const [routes];
+
+  const renderIndicator = (
+    props: SceneRendererProps & {
+      navigationState: any;
+      getTabWidth: (i: number) => number;
+    },
+  ) => {
+    const { position, navigationState, getTabWidth } = props;
+    const inputRange = [
+      0, 0.48, 0.49, 0.51, 0.52, 1, 1.48, 1.49, 1.51, 1.52, 2,
+    ];
+
+    const scale = position.interpolate({
+      inputRange,
+      outputRange: inputRange.map((x) => (Math.trunc(x) === x ? 2 : 0.1)),
+    });
+
+    const opacity = position.interpolate({
+      inputRange,
+      outputRange: inputRange.map((x) => {
+        const d = x - Math.trunc(x);
+        return d === 0.49 || d === 0.51 ? 0 : 1;
+      }),
+    });
+
+    const translateX = position.interpolate({
+      inputRange: inputRange,
+      outputRange: inputRange.map((x) => {
+        const i = Math.round(x);
+        return i * getTabWidth(i) * (I18nManager.isRTL ? -1 : 1);
+      }),
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            width: \`${100 / navigationState.routes.length}%\`,
+            transform: [
+              {
+                translateX,
+              },
+            ] as any,
+          },
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.indicator,
+            {
+              opacity,
+              transform: [
+                {
+                  scale,
+                },
+              ],
+            } as any,
+          ]}
+        />
+      </Animated.View>
+    );
+  };
+
+  const renderIcon = ({ route }: { route: any }) => (
+    <Ionicons name={route.icon} size={24} style={styles.icon} />
+  );
+
+  const renderBadge = ({ route }: { route: any }) => {
+    if (route.key === "albums") {
+      return (
+        <View style={styles.badge}>
+          <Text style={styles.count}>42</Text>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
+  const renderTabBar = (
+    props: SceneRendererProps & {
+      navigationState: any;
+    },
+  ) => (
+    <View
+      style={[
+        styles.tabbar,
+        {
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
+      <TabBar
+        {...props}
+        renderIcon={renderIcon}
+        renderBadge={renderBadge}
+        renderIndicator={renderIndicator}
+        style={styles.tabbar}
+      />
+    </View>
+  );
+
+  return (
+    <TabView
+      navigationState={{
+        index,
+        routes,
+      }}
+      renderScene={renderScene}
+      renderTabBar={renderTabBar}
+      tabBarPosition="bottom"
+      onIndexChange={onIndexChange}
+    />
+  );
+};
+
+CustomIndicator.options = {
+  title: "Custom indicator",
+  headerShadowVisible: false,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: "#263238",
+  },
+};
+
+export default CustomIndicator;
+
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: "#263238",
+    overflow: "hidden",
+  },
+  icon: {
+    backgroundColor: "transparent",
+    color: "white",
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  indicator: {
+    backgroundColor: "rgb(0, 132, 255)",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    margin: 6,
+  },
+  badge: {
+    marginTop: 4,
+    marginRight: 32,
+    backgroundColor: "#f44336",
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  count: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: -2,
+  },
+});
+"
+`;
