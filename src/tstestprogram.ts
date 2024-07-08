@@ -1,8 +1,19 @@
 import * as ts from "typescript";
 import * as path from "path";
+import { globSync } from "glob";
 
-const basePath = path.resolve("./submodules/react-navigation/example/src");
-compile([`${basePath}/index.tsx`], [basePath]);
+const files: FileLookup = {};
+const paths = globSync("submodules/react-navigation/example/src/**/*.tsx");
+const rootPath = path.dirname(__dirname) + "/";
+console.log({ paths, rootPath });
+const basePath = "./submodules/react-navigation/example/src";
+compile(paths, [basePath]);
+
+type FileLookup = {
+  [fileName: string]: {
+    dependsOn: [string, string][];
+  };
+};
 
 function createCompilerHost(
   options: ts.CompilerOptions,
@@ -47,15 +58,28 @@ function createCompilerHost(
     containingFile: string
   ): ts.ResolvedModule[] {
     const resolvedModules: ts.ResolvedModule[] = [];
-    console.log({ moduleNames });
+    const containingFileLocalPath = containingFile.replace(rootPath, "");
+
+    let file = files[containingFileLocalPath];
+    if (!file) {
+      file = files[containingFileLocalPath] = {
+        dependsOn: [],
+      };
+    }
+
+    // console.log({ moduleNames });
     for (const moduleName of moduleNames) {
       // try to use standard resolution
       let result = ts.resolveModuleName(moduleName, containingFile, options, {
         fileExists,
         readFile,
       });
-      console.log(">>", containingFile, moduleName, result.resolvedModule);
+      // console.log(">>", containingFile, moduleName, result.resolvedModule);
       if (result.resolvedModule) {
+        file.dependsOn.push([
+          moduleName,
+          result.resolvedModule.resolvedFileName.replace(rootPath, ""),
+        ]);
         resolvedModules.push(result.resolvedModule);
       } else {
         // check fallback locations, for simplicity assume that module at location
@@ -64,6 +88,11 @@ function createCompilerHost(
           const modulePath = path.join(location, moduleName + ".d.ts");
           if (fileExists(modulePath)) {
             resolvedModules.push({ resolvedFileName: modulePath });
+          } else {
+            // TEST
+            resolvedModules.push({
+              resolvedFileName: `unmatched-${moduleName}.ts`,
+            });
           }
         }
       }
@@ -73,7 +102,7 @@ function createCompilerHost(
 }
 
 function compile(sourceFiles: string[], moduleSearchLocations: string[]): void {
-  console.log({ sourceFiles, moduleSearchLocations });
+  // console.log({ sourceFiles, moduleSearchLocations });
 
   const options: ts.CompilerOptions = {
     module: ts.ModuleKind.AMD,
@@ -82,6 +111,9 @@ function compile(sourceFiles: string[], moduleSearchLocations: string[]): void {
   const host = createCompilerHost(options, moduleSearchLocations);
   const program = ts.createProgram(sourceFiles, options, host);
 
-  console.log("> program", program.getSourceFiles());
+  console.log("> program", program.getSourceFiles().length);
+
+  console.log(JSON.stringify(files, null, 2));
+
   /// do something with program...
 }
