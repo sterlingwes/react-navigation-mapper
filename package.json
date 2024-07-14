@@ -1,6 +1,5 @@
 {
   "name": "react-navigation-mapper",
-  "module": "src/main.ts",
   "type": "module",
   "private": true,
   "workspaces": [
@@ -13,10 +12,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@ts-morph/bootstrap": "^0.24.0",
     "glob": "^10.4.2",
     "prettier": "^3.3.2",
-    "putout": "^35.35.6",
     "typescript": "^5.5.2"
   }
 }
