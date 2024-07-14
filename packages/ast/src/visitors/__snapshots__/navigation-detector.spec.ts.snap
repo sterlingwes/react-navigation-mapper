@@ -1,0 +1,37 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NavigationDetector visitor multi screen simple navigate calls should detect all components & navigation calls 1`] = `
+[
+  {
+    "name": "ArticleScreen",
+    "navigationCalls": [
+      {
+        "destination": "NewsFeed",
+        "method": "push",
+      },
+      {
+        "destination": "NewsFeed",
+        "method": "replace",
+      },
+    ],
+  },
+  {
+    "name": "NewsFeedScreen",
+    "navigationCalls": [
+      {
+        "destination": "Albums",
+        "method": "push",
+      },
+    ],
+  },
+  {
+    "name": "AlbumsScreen",
+    "navigationCalls": [
+      {
+        "destination": "Article",
+        "method": "navigate",
+      },
+    ],
+  },
+]
+`;
