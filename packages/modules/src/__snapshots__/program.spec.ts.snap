@@ -1,0 +1,493 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createProgramLookup should return the program and files lookup 1`] = `
+{
+  "submodules/react-navigation/example/src/Restart.native.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Screens/AuthFlow.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Screens/BottomTabs.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+      [
+        "./SimpleStack",
+        "submodules/react-navigation/example/src/Screens/SimpleStack.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/DrawerView.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Screens/DynamicTabs.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Screens/LinkComponent.tsx": {
+    "dependsOn": [
+      [
+        "../screens",
+        "submodules/react-navigation/example/src/screens.tsx",
+      ],
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/MasterDetail.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/MaterialBottomTabs.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+      [
+        "./SimpleStack",
+        "submodules/react-navigation/example/src/Screens/SimpleStack.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/MaterialTopTabs.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/MixedHeaderMode.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/MixedStack.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/ModalStack.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/NativeStack.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/NativeStackPreventRemove.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/NotFound.tsx": {
+    "dependsOn": [
+      [
+        "../screens",
+        "submodules/react-navigation/example/src/screens.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/SimpleStack.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/StackHeaderCustomization.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/BlurView",
+        "submodules/react-navigation/example/src/Shared/BlurView.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/StackPreventRemove.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/StackTransparent.tsx": {
+    "dependsOn": [
+      [
+        "../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../Shared/NewsFeed",
+        "submodules/react-navigation/example/src/Shared/NewsFeed.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView.tsx": {
+    "dependsOn": [
+      [
+        "./TabView/AutoWidthTabBar",
+        "submodules/react-navigation/example/src/Screens/TabView/AutoWidthTabBar.tsx",
+      ],
+      [
+        "./TabView/Coverflow",
+        "submodules/react-navigation/example/src/Screens/TabView/Coverflow.tsx",
+      ],
+      [
+        "./TabView/CustomIndicator",
+        "submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx",
+      ],
+      [
+        "./TabView/CustomTabBar",
+        "submodules/react-navigation/example/src/Screens/TabView/CustomTabBar.tsx",
+      ],
+      [
+        "./TabView/ScrollableTabBar",
+        "submodules/react-navigation/example/src/Screens/TabView/ScrollableTabBar.tsx",
+      ],
+      [
+        "./TabView/TabBarIcon",
+        "submodules/react-navigation/example/src/Screens/TabView/TabBarIcon.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/AutoWidthTabBar.tsx": {
+    "dependsOn": [
+      [
+        "../../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/Coverflow.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx": {
+    "dependsOn": [
+      [
+        "../../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/CustomTabBar.tsx": {
+    "dependsOn": [
+      [
+        "../../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/ScrollableTabBar.tsx": {
+    "dependsOn": [
+      [
+        "../../Shared/Albums",
+        "submodules/react-navigation/example/src/Shared/Albums.tsx",
+      ],
+      [
+        "../../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Screens/TabView/TabBarIcon.tsx": {
+    "dependsOn": [
+      [
+        "../../Shared/Article",
+        "submodules/react-navigation/example/src/Shared/Article.tsx",
+      ],
+      [
+        "../../Shared/Chat",
+        "submodules/react-navigation/example/src/Shared/Chat.tsx",
+      ],
+      [
+        "../../Shared/Contacts",
+        "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/Shared/Albums.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/Article.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/BlurView.native.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/BlurView.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/Chat.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/Contacts.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/NewsFeed.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/Shared/SettingsItem.tsx": {
+    "dependsOn": [],
+  },
+  "submodules/react-navigation/example/src/index.tsx": {
+    "dependsOn": [
+      [
+        "./Restart",
+        "submodules/react-navigation/example/src/Restart.tsx",
+      ],
+      [
+        "./screens",
+        "submodules/react-navigation/example/src/screens.tsx",
+      ],
+      [
+        "./Screens/NotFound",
+        "submodules/react-navigation/example/src/Screens/NotFound.tsx",
+      ],
+      [
+        "./Shared/SettingsItem",
+        "submodules/react-navigation/example/src/Shared/SettingsItem.tsx",
+      ],
+    ],
+  },
+  "submodules/react-navigation/example/src/screens.tsx": {
+    "dependsOn": [
+      [
+        "./Screens/AuthFlow",
+        "submodules/react-navigation/example/src/Screens/AuthFlow.tsx",
+      ],
+      [
+        "./Screens/BottomTabs",
+        "submodules/react-navigation/example/src/Screens/BottomTabs.tsx",
+      ],
+      [
+        "./Screens/DrawerView",
+        "submodules/react-navigation/example/src/Screens/DrawerView.tsx",
+      ],
+      [
+        "./Screens/DynamicTabs",
+        "submodules/react-navigation/example/src/Screens/DynamicTabs.tsx",
+      ],
+      [
+        "./Screens/LinkComponent",
+        "submodules/react-navigation/example/src/Screens/LinkComponent.tsx",
+      ],
+      [
+        "./Screens/MasterDetail",
+        "submodules/react-navigation/example/src/Screens/MasterDetail.tsx",
+      ],
+      [
+        "./Screens/MaterialBottomTabs",
+        "submodules/react-navigation/example/src/Screens/MaterialBottomTabs.tsx",
+      ],
+      [
+        "./Screens/MaterialTopTabs",
+        "submodules/react-navigation/example/src/Screens/MaterialTopTabs.tsx",
+      ],
+      [
+        "./Screens/MixedHeaderMode",
+        "submodules/react-navigation/example/src/Screens/MixedHeaderMode.tsx",
+      ],
+      [
+        "./Screens/MixedStack",
+        "submodules/react-navigation/example/src/Screens/MixedStack.tsx",
+      ],
+      [
+        "./Screens/ModalStack",
+        "submodules/react-navigation/example/src/Screens/ModalStack.tsx",
+      ],
+      [
+        "./Screens/NativeStack",
+        "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
+      ],
+      [
+        "./Screens/NativeStackHeaderCustomization",
+        "submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx",
+      ],
+      [
+        "./Screens/NativeStackPreventRemove",
+        "submodules/react-navigation/example/src/Screens/NativeStackPreventRemove.tsx",
+      ],
+      [
+        "./Screens/SimpleStack",
+        "submodules/react-navigation/example/src/Screens/SimpleStack.tsx",
+      ],
+      [
+        "./Screens/StackHeaderCustomization",
+        "submodules/react-navigation/example/src/Screens/StackHeaderCustomization.tsx",
+      ],
+      [
+        "./Screens/StackPreventRemove",
+        "submodules/react-navigation/example/src/Screens/StackPreventRemove.tsx",
+      ],
+      [
+        "./Screens/StackTransparent",
+        "submodules/react-navigation/example/src/Screens/StackTransparent.tsx",
+      ],
+      [
+        "./Screens/TabView",
+        "submodules/react-navigation/example/src/Screens/TabView.tsx",
+      ],
+    ],
+  },
+}
+`;

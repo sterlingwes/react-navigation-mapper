@@ -2,6 +2,10 @@
   "name": "react-navigation-mapper",
   "module": "src/main.ts",
   "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
