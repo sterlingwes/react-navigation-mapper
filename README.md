@@ -9,6 +9,21 @@ So far, an experiment.
 - [ ] hoist / statically link all conditionals so they can be enumerated
 - [ ] figure out how to deal with things like `useUserAuthenticated` that wrap a condition used to render screen paths
 
+## Contributing
+
+Best way to get a sense of the AST is to do a combination of:
+
+- reference https://astexplorer.net/ with your sample module of choice; and
+- run bun in debug mode
+
+### Running Bun in Debug Mode
+
+For example if you wanted to debug a test suite you could:
+
+- add a breakpoint by clicking next to the line number where you want to stop
+- run `bun --inspect-wait='localhost:6499/bunbun' test packages/ast`
+- run "Attach to Bun" from the "run & debug" pane (or hit F5)
+
 --
 
 New approach?
