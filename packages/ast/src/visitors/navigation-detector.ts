@@ -1,4 +1,10 @@
-import ts from "typescript";
+import ts, {
+  isBlock,
+  isImportSpecifier,
+  isPropertyAccessExpression,
+  isTypeReferenceNode,
+  isVariableDeclaration,
+} from "typescript";
 
 import { AbstractVisitor } from "../abstract-visitor";
 import {
@@ -12,7 +18,6 @@ import {
 import {
   getBlockPosition,
   getVarDeclarationName,
-  returnsJSX,
   varDeclarationIsPossibleFunctionComponent,
 } from "./utils/component";
 
@@ -57,82 +62,66 @@ export class NavigationDetectorVisitor extends AbstractVisitor<
     });
   }
 
-  visitor(
-    node: ts.Node,
-    context: { globalState: GlobalState; moduleState: ModuleState },
-    forEachChild: (node: ts.Node) => void
-  ) {
-    const { moduleState } = context;
+  cases = [
+    this.case(isImportSpecifier, (node, { moduleState }) => {
+      if (importSpecifierIsNativeStackScreenPropsType(node)) {
+        moduleState.checkProps = true;
+      }
+    }),
 
-    // if (
-    //   moduleState.insideComponentWithNavigationProp &&
-    //   [ts.SyntaxKind.Identifier].includes(node.kind) === false
-    // ) {
-    //   console.log(ts.SyntaxKind[node.kind]);
-    // }
+    this.case(isVariableDeclaration, (node, { moduleState }) => {
+      if (varDeclarationIsPossibleFunctionComponent(node)) {
+        moduleState.currentComponent = getVarDeclarationName(node);
+        moduleState.currentComponentPosition = getBlockPosition(node);
+      }
+    }),
 
-    const insideComponent = () => {
-      return (
-        moduleState.currentComponent !== undefined &&
-        moduleState.insideComponentWithNavigationProp
-      );
-    };
+    this.case(isTypeReferenceNode, (node, { moduleState }) => {
+      // TODO: handle non-object destructuring binding pattern
+      if (moduleState.checkProps && typeReferenceIsNavigationScreenProp(node)) {
+        moduleState.insideComponentWithNavigationProp = true;
+      }
+    }),
 
-    switch (node.kind) {
-      case ts.SyntaxKind.VariableDeclaration:
-        const varDec = node as ts.VariableDeclaration;
-        if (varDeclarationIsPossibleFunctionComponent(varDec)) {
-          moduleState.currentComponent = getVarDeclarationName(varDec);
-          moduleState.currentComponentPosition = getBlockPosition(varDec);
+    // TODO: handle when navigation prop is destructured
+    this.case(isPropertyAccessExpression, (node, { moduleState }) => {
+      if (propertyAccessIsOnNavigation(node)) {
+        // TODO: capture destination screen and component name reference to establish link
+        // using push, replace, navigate methods
+        const method = getNavigationMethodName(node);
+        if (isValidNavigationMethod(method)) {
+          moduleState.currentComponentNavigationCalls.push({
+            method,
+            destination: getNavigationDestination(node),
+          });
         }
-        break;
-      case ts.SyntaxKind.ImportSpecifier:
-        const importSpecifier = node as ts.ImportSpecifier;
-        if (importSpecifierIsNativeStackScreenPropsType(importSpecifier)) {
-          moduleState.checkProps = true;
-        }
-        break;
-      case ts.SyntaxKind.TypeReference:
-        // TODO: handle non-object destructuring binding pattern
+      }
+    }),
+
+    this.case(isBlock, {
+      onExit: (node, { moduleState, globalState }) => {
         if (
-          moduleState.checkProps &&
-          typeReferenceIsNavigationScreenProp(node as ts.TypeReferenceNode)
+          this.insideComponent() &&
+          node.pos === moduleState.currentComponentPosition
         ) {
-          moduleState.insideComponentWithNavigationProp = true;
+          globalState.components.push({
+            name: moduleState.currentComponent!,
+            navigationCalls:
+              moduleState.currentComponentNavigationCalls.slice(),
+          });
+          moduleState.currentComponent = undefined;
+          moduleState.currentComponentPosition = undefined;
+          moduleState.currentComponentNavigationCalls = [];
+          moduleState.insideComponentWithNavigationProp = false;
         }
-        break;
-      // TODO: handle when navigation prop is destructured
-      case ts.SyntaxKind.PropertyAccessExpression:
-        const propAccess = node as ts.PropertyAccessExpression;
-        if (propertyAccessIsOnNavigation(propAccess)) {
-          // TODO: capture destination screen and component name reference to establish link
-          // using push, replace, navigate methods
-          const method = getNavigationMethodName(propAccess);
-          if (isValidNavigationMethod(method)) {
-            context.moduleState.currentComponentNavigationCalls.push({
-              method,
-              destination: getNavigationDestination(propAccess),
-            });
-          }
-        }
-        break;
-    }
+      },
+    }),
+  ];
 
-    forEachChild(node);
-
-    if (
-      node.kind === ts.SyntaxKind.Block &&
-      insideComponent() &&
-      node.pos === moduleState.currentComponentPosition
-    ) {
-      context.globalState.components.push({
-        name: moduleState.currentComponent!,
-        navigationCalls: moduleState.currentComponentNavigationCalls.slice(),
-      });
-      moduleState.currentComponent = undefined;
-      moduleState.currentComponentPosition = undefined;
-      moduleState.currentComponentNavigationCalls = [];
-      moduleState.insideComponentWithNavigationProp = false;
-    }
-  }
+  private insideComponent = () => {
+    return (
+      this.moduleState.currentComponent !== undefined &&
+      this.moduleState.insideComponentWithNavigationProp
+    );
+  };
 }

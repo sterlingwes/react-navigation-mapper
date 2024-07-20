@@ -22,7 +22,7 @@ describe("NavigationDetector visitor", () => {
       const visitor = new NavigationDetectorVisitor();
       visitor.visit(file);
 
-      expect(visitor.getGlobalState().components).toMatchSnapshot();
+      expect(visitor.globalState.components).toMatchSnapshot();
     });
   });
 });

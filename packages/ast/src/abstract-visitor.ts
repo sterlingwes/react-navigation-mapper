@@ -24,24 +24,93 @@ export abstract class AbstractVisitor<
     };
   }
 
-  getGlobalState() {
+  get globalState() {
     return this.options.globalState;
   }
 
-  visit(node: ts.Node) {
-    const { globalState, moduleState } = this.options;
-    const context = {
-      globalState,
-      moduleState,
-    };
-    this.visitor(node, context, (node: ts.Node) =>
-      ts.forEachChild(node, (childNode) => this.visit(childNode))
-    );
+  get moduleState() {
+    return this.options.moduleState;
   }
 
-  abstract visitor(
-    node: ts.Node,
-    context: { globalState: GlobalState; moduleState: ModuleState },
-    forEachChild: (node: ts.Node) => void
-  ): void;
+  get context(): {
+    globalState: GlobalState;
+    moduleState: ModuleState;
+  } {
+    return {
+      globalState: this.globalState,
+      moduleState: this.moduleState,
+    };
+  }
+
+  visit(node: ts.Node) {
+    this.switchNode(node);
+  }
+
+  abstract cases: Array<
+    readonly [
+      (node: any) => any,
+      (
+        | ((
+            node: any,
+            context: { globalState: GlobalState; moduleState: ModuleState }
+          ) => any)
+        | {
+            onEnter?: (
+              node: any,
+              context: { globalState: GlobalState; moduleState: ModuleState }
+            ) => any;
+            onExit?: (
+              node: any,
+              context: { globalState: GlobalState; moduleState: ModuleState }
+            ) => any;
+          }
+      ),
+    ]
+  >;
+
+  case<T extends ts.Node>(
+    filter: (node: ts.Node) => node is T,
+    method:
+      | ((
+          node: T,
+          context: { globalState: GlobalState; moduleState: ModuleState }
+        ) => any)
+      | {
+          onEnter?: (
+            node: T,
+            context: { globalState: GlobalState; moduleState: ModuleState }
+          ) => any;
+          onExit?: (
+            node: T,
+            context: { globalState: GlobalState; moduleState: ModuleState }
+          ) => any;
+        }
+  ) {
+    return [filter, method] as const;
+  }
+
+  private switchNode(node: ts.Node) {
+    const match = this.cases.find(([filter]) => {
+      return filter(node);
+    });
+
+    if (match && match[1]) {
+      const [, method] = match;
+      if (typeof method === "function") {
+        method(node, this.context);
+        ts.forEachChild(node, (childNode) => this.switchNode(childNode));
+      } else {
+        const { onEnter, onExit } = method;
+        if (onEnter) {
+          onEnter(node, this.context);
+        }
+        ts.forEachChild(node, (childNode) => this.switchNode(childNode));
+        if (onExit) {
+          onExit(node, this.context);
+        }
+      }
+    } else {
+      ts.forEachChild(node, (childNode) => this.switchNode(childNode));
+    }
+  }
 }
