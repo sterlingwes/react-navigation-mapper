@@ -13,7 +13,7 @@ import {
   resolveNavigatorNamespaceFromFactoryCall,
 } from "./utils/navigators";
 import { jsxElementIsScreen } from "./utils/stack-screen";
-import { ComponentAwareVisitor } from "./component-aware-visitor";
+import { ComponentAwareVisitor } from "./mixable/component-aware-visitor";
 
 type Screen = {
   name: string;

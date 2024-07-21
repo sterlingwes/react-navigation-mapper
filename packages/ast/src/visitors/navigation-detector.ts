@@ -13,8 +13,8 @@ import {
   propertyAccessIsOnNavigation,
   typeReferenceIsNavigationScreenProp,
 } from "./utils/navigation-prop";
-import { ComponentAwareVisitor } from "./component-aware-visitor";
-import { ModuleAwareVisitor } from "./module-aware-visitor";
+import { ComponentAwareVisitor } from "./mixable/component-aware-visitor";
+import { ModuleAwareVisitor } from "./mixable/module-aware-visitor";
 
 type NavigationCall = {
   method: "push" | "replace" | "navigate";

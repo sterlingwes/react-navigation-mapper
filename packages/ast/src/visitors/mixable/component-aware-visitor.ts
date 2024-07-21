@@ -4,17 +4,14 @@ import ts, {
   isVariableDeclaration,
 } from "typescript";
 
-import {
-  AbstractVisitor,
-  type AbstractVisitorOptions,
-} from "../abstract-visitor";
+import { BaseVisitor, type BaseVisitorOptions } from "../abstract/base-visitor";
 import {
   functionDeclarationIsPossibleComponent,
   getBlockPosition,
   getFunctionDeclarationName,
   getVarDeclarationName,
   varDeclarationIsPossibleFunctionComponent,
-} from "./utils/component";
+} from "../utils/component";
 
 interface ComponentAwareState extends Record<any, any> {
   currentComponent: string | undefined;
@@ -24,8 +21,8 @@ interface ComponentAwareState extends Record<any, any> {
 export class ComponentAwareVisitor<
   GlobalState extends Record<any, any>,
   ModuleState extends Record<any, any>,
-> extends AbstractVisitor<GlobalState, ModuleState & ComponentAwareState> {
-  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState> = {}) {
+> extends BaseVisitor<GlobalState, ModuleState & ComponentAwareState> {
+  constructor(options: BaseVisitorOptions<GlobalState, ModuleState> = {}) {
     super({
       initialGlobalState: {
         ...options.initialGlobalState,

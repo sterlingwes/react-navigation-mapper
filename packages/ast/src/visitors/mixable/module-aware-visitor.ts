@@ -6,8 +6,8 @@ import {
   isSourceFile,
   isStringLiteral,
 } from "typescript";
-import { type AbstractVisitorOptions } from "../abstract-visitor";
-import { MixableVisitor } from "../mixable-visitor";
+import { type BaseVisitorOptions } from "../abstract/base-visitor";
+import { MixableVisitor } from "../abstract/mixable-visitor";
 
 type Import = {
   type: "named" | "default" | "namespace";
@@ -30,7 +30,7 @@ export class ModuleAwareVisitor<
     )?.source;
   }
 
-  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState> = {}) {
+  constructor(options: BaseVisitorOptions<GlobalState, ModuleState> = {}) {
     super({
       initialGlobalState: {
         ...options.initialGlobalState,

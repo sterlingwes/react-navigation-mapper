@@ -1,6 +1,6 @@
 import ts from "typescript";
 
-export interface AbstractVisitorOptions<GlobalState, ModuleState> {
+export interface BaseVisitorOptions<GlobalState, ModuleState> {
   initialGlobalState?: GlobalState;
   initialModuleState?: ModuleState;
 }
@@ -11,10 +11,10 @@ export interface AbstractVisitorOptions<GlobalState, ModuleState> {
 interface Mixin<GlobalState, ModuleState> {
   get globalState(): GlobalState;
   get moduleState(): ModuleState;
-  get mixinCases(): (typeof AbstractVisitor.prototype)["cases"];
+  get mixinCases(): (typeof BaseVisitor.prototype)["cases"];
 }
 
-export abstract class AbstractVisitor<
+export abstract class BaseVisitor<
   GlobalState extends Record<any, any>,
   ModuleState extends Record<any, any>,
 > {
@@ -45,7 +45,7 @@ export abstract class AbstractVisitor<
     ]
   > = [];
 
-  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState> = {}) {
+  constructor(options: BaseVisitorOptions<GlobalState, ModuleState> = {}) {
     this.options = {
       globalState: options.initialGlobalState ?? ({} as Record<any, any>),
       moduleState: options.initialModuleState ?? ({} as Record<any, any>),
