@@ -17,6 +17,28 @@ export abstract class AbstractVisitor<
     moduleState: ModuleState;
   };
 
+  private cases: Array<
+    readonly [
+      (node: any) => any,
+      (
+        | ((
+            node: any,
+            context: { globalState: GlobalState; moduleState: ModuleState }
+          ) => any)
+        | {
+            onEnter?: (
+              node: any,
+              context: { globalState: GlobalState; moduleState: ModuleState }
+            ) => any;
+            onExit?: (
+              node: any,
+              context: { globalState: GlobalState; moduleState: ModuleState }
+            ) => any;
+          }
+      ),
+    ]
+  > = [];
+
   constructor(options: AbstractVisitorOptions<GlobalState, ModuleState>) {
     this.options = {
       globalState: options.initialGlobalState ?? ({} as Record<any, any>),
@@ -42,31 +64,13 @@ export abstract class AbstractVisitor<
     };
   }
 
+  addVisitorCases(cases: typeof this.cases) {
+    this.cases = [...this.cases, ...cases];
+  }
+
   visit(node: ts.Node) {
     this.switchNode(node);
   }
-
-  abstract cases: Array<
-    readonly [
-      (node: any) => any,
-      (
-        | ((
-            node: any,
-            context: { globalState: GlobalState; moduleState: ModuleState }
-          ) => any)
-        | {
-            onEnter?: (
-              node: any,
-              context: { globalState: GlobalState; moduleState: ModuleState }
-            ) => any;
-            onExit?: (
-              node: any,
-              context: { globalState: GlobalState; moduleState: ModuleState }
-            ) => any;
-          }
-      ),
-    ]
-  >;
 
   case<T extends ts.Node>(
     filter: (node: ts.Node) => node is T,
@@ -119,6 +123,17 @@ export abstract class AbstractVisitor<
     });
 
     ts.forEachChild(node, (childNode) => this.switchNode(childNode));
-    exitMethods.forEach((method) => method(node, this.context));
+    const deferredActions: Array<() => any> = [];
+    exitMethods.forEach((method) => {
+      const deferredExitAction = method(node, this.context);
+      // TODO: document the order of class visitor method execution
+      // this deferral method is a sneaky way of allowing the subclass
+      // to benefit from exit actions that happen after it, even though
+      // they're queued up before subclass visitor cases
+      if (typeof deferredExitAction === "function") {
+        deferredActions.push(deferredExitAction);
+      }
+    });
+    deferredActions.forEach((action) => action());
   }
 }

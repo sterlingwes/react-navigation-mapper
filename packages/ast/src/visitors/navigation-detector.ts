@@ -20,6 +20,7 @@ import {
   getVarDeclarationName,
   varDeclarationIsPossibleFunctionComponent,
 } from "./utils/component";
+import { ComponentAwareVisitor } from "./component-aware-visitor";
 
 type NavigationCall = {
   method: "push" | "replace" | "navigate";
@@ -38,12 +39,10 @@ interface GlobalState {
 interface ModuleState {
   checkProps: boolean;
   insideComponentWithNavigationProp: boolean;
-  currentComponent: string | undefined;
-  currentComponentPosition: number | undefined;
   currentComponentNavigationCalls: NavigationCall[];
 }
 
-export class NavigationDetectorVisitor extends AbstractVisitor<
+export class NavigationDetectorVisitor extends ComponentAwareVisitor<
   GlobalState,
   ModuleState
 > {
@@ -55,68 +54,60 @@ export class NavigationDetectorVisitor extends AbstractVisitor<
       initialModuleState: {
         checkProps: false,
         insideComponentWithNavigationProp: false,
-        currentComponent: undefined,
-        currentComponentPosition: undefined,
         currentComponentNavigationCalls: [],
       },
     });
-  }
 
-  cases = [
-    this.case(isImportSpecifier, (node, { moduleState }) => {
-      if (importSpecifierIsNativeStackScreenPropsType(node)) {
-        moduleState.checkProps = true;
-      }
-    }),
-
-    this.case(isVariableDeclaration, (node, { moduleState }) => {
-      if (varDeclarationIsPossibleFunctionComponent(node)) {
-        moduleState.currentComponent = getVarDeclarationName(node);
-        moduleState.currentComponentPosition = getBlockPosition(node);
-      }
-    }),
-
-    this.case(isTypeReferenceNode, (node, { moduleState }) => {
-      // TODO: handle non-object destructuring binding pattern
-      if (moduleState.checkProps && typeReferenceIsNavigationScreenProp(node)) {
-        moduleState.insideComponentWithNavigationProp = true;
-      }
-    }),
-
-    // TODO: handle when navigation prop is destructured
-    this.case(isPropertyAccessExpression, (node, { moduleState }) => {
-      if (propertyAccessIsOnNavigation(node)) {
-        // TODO: capture destination screen and component name reference to establish link
-        // using push, replace, navigate methods
-        const method = getNavigationMethodName(node);
-        if (isValidNavigationMethod(method)) {
-          moduleState.currentComponentNavigationCalls.push({
-            method,
-            destination: getNavigationDestination(node),
-          });
+    this.addVisitorCases([
+      this.case(isImportSpecifier, (node, { moduleState }) => {
+        if (importSpecifierIsNativeStackScreenPropsType(node)) {
+          moduleState.checkProps = true;
         }
-      }
-    }),
+      }),
 
-    this.case(isBlock, {
-      onExit: (node, { moduleState, globalState }) => {
+      this.case(isTypeReferenceNode, (node, { moduleState }) => {
+        // TODO: handle non-object destructuring binding pattern
         if (
-          this.insideComponent() &&
-          node.pos === moduleState.currentComponentPosition
+          moduleState.checkProps &&
+          typeReferenceIsNavigationScreenProp(node)
         ) {
-          globalState.components.push({
-            name: moduleState.currentComponent!,
-            navigationCalls:
-              moduleState.currentComponentNavigationCalls.slice(),
-          });
-          moduleState.currentComponent = undefined;
-          moduleState.currentComponentPosition = undefined;
-          moduleState.currentComponentNavigationCalls = [];
-          moduleState.insideComponentWithNavigationProp = false;
+          moduleState.insideComponentWithNavigationProp = true;
         }
-      },
-    }),
-  ];
+      }),
+
+      // TODO: handle when navigation prop is destructured
+      this.case(isPropertyAccessExpression, (node, { moduleState }) => {
+        if (propertyAccessIsOnNavigation(node)) {
+          // TODO: capture destination screen and component name reference to establish link
+          // using push, replace, navigate methods
+          const method = getNavigationMethodName(node);
+          if (isValidNavigationMethod(method)) {
+            moduleState.currentComponentNavigationCalls.push({
+              method,
+              destination: getNavigationDestination(node),
+            });
+          }
+        }
+      }),
+
+      this.case(isBlock, {
+        onExit: (node, { moduleState, globalState }) => {
+          if (
+            this.insideComponent() &&
+            node.pos === moduleState.currentComponentPosition
+          ) {
+            globalState.components.push({
+              name: moduleState.currentComponent!,
+              navigationCalls:
+                moduleState.currentComponentNavigationCalls.slice(),
+            });
+            moduleState.currentComponentNavigationCalls = [];
+            moduleState.insideComponentWithNavigationProp = false;
+          }
+        },
+      }),
+    ]);
+  }
 
   private insideComponent = () => {
     return (
