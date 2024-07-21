@@ -90,27 +90,35 @@ export abstract class AbstractVisitor<
   }
 
   private switchNode(node: ts.Node) {
-    const match = this.cases.find(([filter]) => {
+    const matches = this.cases.filter(([filter]) => {
       return filter(node);
     });
 
-    if (match && match[1]) {
-      const [, method] = match;
-      if (typeof method === "function") {
-        method(node, this.context);
-        ts.forEachChild(node, (childNode) => this.switchNode(childNode));
-      } else {
-        const { onEnter, onExit } = method;
-        if (onEnter) {
-          onEnter(node, this.context);
-        }
-        ts.forEachChild(node, (childNode) => this.switchNode(childNode));
-        if (onExit) {
-          onExit(node, this.context);
+    const exitMethods: Array<
+      (
+        node: any,
+        context: { globalState: GlobalState; moduleState: ModuleState }
+      ) => any
+    > = [];
+
+    matches.forEach((match) => {
+      if (match && match[1]) {
+        const [, method] = match;
+        if (typeof method === "function") {
+          method(node, this.context);
+        } else {
+          const { onEnter, onExit } = method;
+          if (onEnter) {
+            onEnter(node, this.context);
+          }
+          if (onExit) {
+            exitMethods.push(onExit);
+          }
         }
       }
-    } else {
-      ts.forEachChild(node, (childNode) => this.switchNode(childNode));
-    }
+    });
+
+    ts.forEachChild(node, (childNode) => this.switchNode(childNode));
+    exitMethods.forEach((method) => method(node, this.context));
   }
 }
