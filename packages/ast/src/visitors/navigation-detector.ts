@@ -70,7 +70,10 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
 
       // TODO: handle when navigation prop is destructured
       this.case(isPropertyAccessExpression, (node, { moduleState }) => {
-        if (propertyAccessIsOnNavigation(node)) {
+        if (
+          moduleState.insideComponentWithNavigationProp &&
+          propertyAccessIsOnNavigation(node)
+        ) {
           // TODO: capture destination screen and component name reference to establish link
           // using push, replace, navigate methods
           const method = getNavigationMethodName(node);
@@ -103,9 +106,6 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
   }
 
   private insideComponent = () => {
-    return (
-      this.moduleState.currentComponent !== undefined &&
-      this.moduleState.insideComponentWithNavigationProp
-    );
+    return this.moduleState.currentComponent !== undefined;
   };
 }

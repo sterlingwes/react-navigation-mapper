@@ -33,5 +33,9 @@ exports[`NavigationDetector visitor multi screen simple navigate calls should de
       },
     ],
   },
+  {
+    "name": "NativeStackScreen",
+    "navigationCalls": [],
+  },
 ]
 `;
