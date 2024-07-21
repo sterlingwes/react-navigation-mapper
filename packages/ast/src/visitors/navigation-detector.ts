@@ -3,10 +3,8 @@ import ts, {
   isImportSpecifier,
   isPropertyAccessExpression,
   isTypeReferenceNode,
-  isVariableDeclaration,
 } from "typescript";
 
-import { AbstractVisitor } from "../abstract-visitor";
 import {
   getNavigationDestination,
   getNavigationMethodName,
@@ -15,11 +13,6 @@ import {
   propertyAccessIsOnNavigation,
   typeReferenceIsNavigationScreenProp,
 } from "./utils/navigation-prop";
-import {
-  getBlockPosition,
-  getVarDeclarationName,
-  varDeclarationIsPossibleFunctionComponent,
-} from "./utils/component";
 import { ComponentAwareVisitor } from "./component-aware-visitor";
 
 type NavigationCall = {

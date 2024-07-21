@@ -1,11 +1,17 @@
-import ts, { isBlock, isVariableDeclaration } from "typescript";
+import ts, {
+  isBlock,
+  isFunctionDeclaration,
+  isVariableDeclaration,
+} from "typescript";
 
 import {
   AbstractVisitor,
   type AbstractVisitorOptions,
 } from "../abstract-visitor";
 import {
+  functionDeclarationIsPossibleComponent,
   getBlockPosition,
+  getFunctionDeclarationName,
   getVarDeclarationName,
   varDeclarationIsPossibleFunctionComponent,
 } from "./utils/component";
@@ -35,6 +41,13 @@ export class ComponentAwareVisitor<
       this.case(isVariableDeclaration, (node, { moduleState }) => {
         if (varDeclarationIsPossibleFunctionComponent(node)) {
           moduleState.currentComponent = getVarDeclarationName(node);
+          moduleState.currentComponentPosition = getBlockPosition(node);
+        }
+      }),
+
+      this.case(isFunctionDeclaration, (node, { moduleState }) => {
+        if (functionDeclarationIsPossibleComponent(node)) {
+          moduleState.currentComponent = getFunctionDeclarationName(node);
           moduleState.currentComponentPosition = getBlockPosition(node);
         }
       }),
