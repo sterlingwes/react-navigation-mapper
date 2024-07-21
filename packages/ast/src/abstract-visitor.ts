@@ -8,6 +8,12 @@ export interface AbstractVisitorOptions<GlobalState, ModuleState> {
 // TODO: add getAndReset moduleState which can be called after visiting a whole file
 // TODO: add getAndReset globalState whcih can be called after visiting a whole project
 
+interface Mixin<GlobalState, ModuleState> {
+  get globalState(): GlobalState;
+  get moduleState(): ModuleState;
+  get mixinCases(): (typeof AbstractVisitor.prototype)["cases"];
+}
+
 export abstract class AbstractVisitor<
   GlobalState extends Record<any, any>,
   ModuleState extends Record<any, any>,
@@ -39,7 +45,7 @@ export abstract class AbstractVisitor<
     ]
   > = [];
 
-  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState>) {
+  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState> = {}) {
     this.options = {
       globalState: options.initialGlobalState ?? ({} as Record<any, any>),
       moduleState: options.initialModuleState ?? ({} as Record<any, any>),
@@ -66,6 +72,14 @@ export abstract class AbstractVisitor<
 
   addVisitorCases(cases: typeof this.cases) {
     this.cases = [...this.cases, ...cases];
+    return this;
+  }
+
+  withMixin(mixin: Mixin<GlobalState, ModuleState>) {
+    Object.assign(this.globalState, mixin.globalState);
+    Object.assign(this.moduleState, mixin.moduleState);
+    this.cases = [...mixin.mixinCases, ...this.cases];
+    return this;
   }
 
   visit(node: ts.Node) {

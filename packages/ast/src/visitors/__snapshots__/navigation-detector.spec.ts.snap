@@ -14,6 +14,7 @@ exports[`NavigationDetector visitor multi screen simple navigate calls should de
         "method": "replace",
       },
     ],
+    "source": "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
   },
   {
     "name": "NewsFeedScreen",
@@ -23,6 +24,7 @@ exports[`NavigationDetector visitor multi screen simple navigate calls should de
         "method": "push",
       },
     ],
+    "source": "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
   },
   {
     "name": "AlbumsScreen",
@@ -32,10 +34,12 @@ exports[`NavigationDetector visitor multi screen simple navigate calls should de
         "method": "navigate",
       },
     ],
+    "source": "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
   },
   {
     "name": "NativeStackScreen",
     "navigationCalls": [],
+    "source": "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
   },
 ]
 `;

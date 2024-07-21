@@ -25,7 +25,7 @@ export class ComponentAwareVisitor<
   GlobalState extends Record<any, any>,
   ModuleState extends Record<any, any>,
 > extends AbstractVisitor<GlobalState, ModuleState & ComponentAwareState> {
-  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState>) {
+  constructor(options: AbstractVisitorOptions<GlobalState, ModuleState> = {}) {
     super({
       initialGlobalState: {
         ...options.initialGlobalState,

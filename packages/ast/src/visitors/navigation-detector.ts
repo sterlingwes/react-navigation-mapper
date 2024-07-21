@@ -14,6 +14,7 @@ import {
   typeReferenceIsNavigationScreenProp,
 } from "./utils/navigation-prop";
 import { ComponentAwareVisitor } from "./component-aware-visitor";
+import { ModuleAwareVisitor } from "./module-aware-visitor";
 
 type NavigationCall = {
   method: "push" | "replace" | "navigate";
@@ -23,6 +24,7 @@ type NavigationCall = {
 type Component = {
   name: string;
   navigationCalls: NavigationCall[];
+  source: string;
 };
 
 interface GlobalState {
@@ -96,13 +98,14 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
               name: moduleState.currentComponent!,
               navigationCalls:
                 moduleState.currentComponentNavigationCalls.slice(),
+              source: moduleState.currentSourceFile,
             });
             moduleState.currentComponentNavigationCalls = [];
             moduleState.insideComponentWithNavigationProp = false;
           }
         },
       }),
-    ]);
+    ]).withMixin(new ModuleAwareVisitor());
   }
 
   private insideComponent = () => {
