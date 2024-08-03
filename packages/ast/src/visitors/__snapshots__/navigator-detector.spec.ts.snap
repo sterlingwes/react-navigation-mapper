@@ -9,14 +9,29 @@ exports[`NavigatorDetector visitor single navigator stack with multiple screens 
       {
         "component": "ArticleScreen",
         "name": "Article",
+        "options": {
+          "headerLargeTitle": true,
+          "headerLargeTitleShadowVisible": false,
+          "title": null,
+        },
       },
       {
         "component": "NewsFeedScreen",
         "name": "NewsFeed",
+        "options": {
+          "fullScreenGestureEnabled": true,
+          "title": "Feed",
+        },
       },
       {
         "component": "AlbumsScreen",
         "name": "Albums",
+        "options": {
+          "headerBlurEffect": "light",
+          "headerTransparent": true,
+          "presentation": "modal",
+          "title": "Albums",
+        },
       },
     ],
   },

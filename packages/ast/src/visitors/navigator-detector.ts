@@ -3,9 +3,8 @@ import {
   isIdentifier,
   isImportSpecifier,
   isJsxAttribute,
-  isJsxExpression,
   isJsxSelfClosingElement,
-  isStringLiteral,
+  isPropertyAssignment,
 } from "typescript";
 
 import {
@@ -15,10 +14,18 @@ import {
 import { jsxElementIsScreen } from "./utils/stack-screen";
 import { BaseVisitor } from "./abstract/base-visitor";
 import { ComponentTrackingMixin } from "./mixable/component-tracking-mixin";
+import { getPrimitiveValue } from "./utils/values";
+import {
+  getJsxAttributeWithArrowFunctionValue,
+  getJsxAttributeWithIdentifierValueAsString,
+  getJsxAttributeWithObjectLiteralValue,
+  getJsxAttributeWithStringValue,
+} from "./utils/jsx";
 
 type Screen = {
   name: string;
   component: string;
+  options?: Record<string, unknown>;
 };
 
 type Stack = {
@@ -88,24 +95,39 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
           node.attributes.properties.forEach((attr) => {
             if (!isJsxAttribute(attr) || !isIdentifier(attr.name)) return;
 
-            if (
-              attr.name.escapedText === "name" &&
-              attr.initializer &&
-              // TODO: handle other cases besides string literal
-              isStringLiteral(attr.initializer)
-            ) {
-              screen.name = attr.initializer.text;
+            const attributeStringValue = getJsxAttributeWithStringValue(attr);
+            if (attr.name.escapedText === "name" && attributeStringValue) {
+              screen.name = attributeStringValue;
+              return;
             }
 
+            const attributeIdentifierStringValue =
+              getJsxAttributeWithIdentifierValueAsString(attr);
             if (
               attr.name.escapedText === "component" &&
-              attr.initializer &&
-              isJsxExpression(attr.initializer) &&
-              attr.initializer.expression &&
-              isIdentifier(attr.initializer.expression)
+              attributeIdentifierStringValue
             ) {
-              screen.component = attr.initializer.expression
-                .escapedText as string;
+              screen.component = attributeIdentifierStringValue;
+              return;
+            }
+
+            const attributeObjectValue =
+              getJsxAttributeWithObjectLiteralValue(attr) ||
+              getJsxAttributeWithArrowFunctionValue(attr);
+            if (attr.name.escapedText === "options" && attributeObjectValue) {
+              screen.options = attributeObjectValue.properties.reduce(
+                (acc, prop) => {
+                  if (!isPropertyAssignment(prop)) return acc;
+                  if (isIdentifier(prop.name) && prop.initializer) {
+                    acc[prop.name.escapedText as string] = getPrimitiveValue(
+                      prop.initializer
+                    );
+                  }
+                  return acc;
+                },
+                {} as Record<string, unknown>
+              );
+              return;
             }
           });
 
