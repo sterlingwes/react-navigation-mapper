@@ -1,12 +1,21 @@
-import ts from "typescript";
+import ts, { isImportDeclaration } from "typescript";
+import { nearestParentOfType } from "./traversal";
 
 export const importSpecifierIsNativeStackScreenPropsType = (
   node: ts.ImportSpecifier
 ) => {
+  if (node.name.escapedText !== "NativeStackScreenProps") {
+    return false;
+  }
+
+  const importDeclarationNode = nearestParentOfType(
+    node,
+    ts.SyntaxKind.ImportDeclaration
+  );
   return (
-    node.name.escapedText === "NativeStackScreenProps" &&
-    node.parent.parent.parent.kind === ts.SyntaxKind.ImportDeclaration &&
-    (node.parent.parent.parent.moduleSpecifier as ts.StringLiteral).text ===
+    importDeclarationNode &&
+    isImportDeclaration(importDeclarationNode) &&
+    (importDeclarationNode.moduleSpecifier as ts.StringLiteral).text ===
       "@react-navigation/native-stack"
   );
 };

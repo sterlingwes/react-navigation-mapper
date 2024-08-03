@@ -12,6 +12,7 @@ export const parseFile = (sourceFile: SourceFile) => {
   const navigatorVisitor = new NavigatorDetectorVisitor();
   navigatorVisitor.visit(sourceFile);
   const { stacks } = navigatorVisitor.globalState;
+  const skippable = Object.keys(stacks).length === 0 && components.length === 0;
 
-  return { components, stacks };
+  return { components, stacks, source: sourceFile.fileName, skippable };
 };

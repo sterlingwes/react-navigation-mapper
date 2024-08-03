@@ -5,6 +5,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "buildall": "./build.sh",
+    "check": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

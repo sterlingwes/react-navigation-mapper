@@ -11,5 +11,5 @@ export const nearestParentOfType = (
     parent = parent.parent;
     depth++;
   }
-  return parent.kind === kind ? parent : undefined;
+  return parent && parent.kind === kind ? parent : undefined;
 };

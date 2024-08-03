@@ -1,8 +1,7 @@
 {
   "name": "@react-navigation-mapper/ast",
   "version": "0.0.0",
-  "module": "src/main.ts",
-  "type": "module",
+  "main": "dist/main.js",
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.5.2"
