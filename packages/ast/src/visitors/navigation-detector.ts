@@ -14,7 +14,7 @@ import {
   typeReferenceIsNavigationScreenProp,
 } from "./utils/navigation-prop";
 import { ComponentAwareVisitor } from "./mixable/component-aware-visitor";
-import { ModuleAwareVisitor } from "./mixable/module-aware-visitor";
+import { ModuleTrackingMixin } from "./mixable/module-tracking-mixin";
 
 type NavigationCall = {
   method: "push" | "replace" | "navigate";
@@ -41,6 +41,8 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
   GlobalState,
   ModuleState
 > {
+  private moduleTracking = new ModuleTrackingMixin();
+
   constructor() {
     super({
       initialGlobalState: {
@@ -98,14 +100,16 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
               name: moduleState.currentComponent!,
               navigationCalls:
                 moduleState.currentComponentNavigationCalls.slice(),
-              source: moduleState.currentSourceFile,
+              source: this.moduleTracking.currentSourceFile,
             });
             moduleState.currentComponentNavigationCalls = [];
             moduleState.insideComponentWithNavigationProp = false;
           }
         },
       }),
-    ]).withMixin(new ModuleAwareVisitor());
+    ]);
+
+    this.mixins.add(this.moduleTracking);
   }
 
   private insideComponent = () => {

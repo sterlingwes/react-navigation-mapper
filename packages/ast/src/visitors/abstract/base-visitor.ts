@@ -1,4 +1,5 @@
 import ts from "typescript";
+import type { MixableVisitor } from "./mixable-visitor";
 
 export interface BaseVisitorOptions<GlobalState, ModuleState> {
   initialGlobalState?: GlobalState;
@@ -22,6 +23,8 @@ export abstract class BaseVisitor<
     globalState: GlobalState;
     moduleState: ModuleState;
   };
+
+  private combinedCases: typeof this.cases = [];
 
   private cases: Array<
     readonly [
@@ -70,6 +73,15 @@ export abstract class BaseVisitor<
     };
   }
 
+  get allCases() {
+    if (this.combinedCases.length) {
+      return this.combinedCases;
+    }
+    return this.cases;
+  }
+
+  mixins: Set<MixableVisitor<GlobalState, ModuleState>> = new Set();
+
   addVisitorCases(cases: typeof this.cases) {
     this.cases = [...this.cases, ...cases];
     return this;
@@ -83,6 +95,13 @@ export abstract class BaseVisitor<
   }
 
   visit(node: ts.Node) {
+    if (!this.combinedCases.length && this.mixins.size) {
+      this.combinedCases = Array.from(this.mixins)
+        .map((mixin) => mixin.mixinCases)
+        .flat()
+        .concat(this.cases);
+    }
+
     this.switchNode(node);
   }
 
@@ -108,7 +127,7 @@ export abstract class BaseVisitor<
   }
 
   private switchNode(node: ts.Node) {
-    const matches = this.cases.filter(([filter]) => {
+    const matches = this.allCases.filter(([filter]) => {
       return filter(node);
     });
 

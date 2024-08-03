@@ -6,7 +6,7 @@ import {
   isSourceFile,
   isStringLiteral,
 } from "typescript";
-import { type BaseVisitorOptions } from "../abstract/base-visitor";
+
 import { MixableVisitor } from "../abstract/mixable-visitor";
 
 type Import = {
@@ -20,36 +20,29 @@ interface ModuleAwareState extends Record<any, any> {
   imports: Import[];
 }
 
-export class ModuleAwareVisitor<
-  GlobalState extends Record<any, any>,
-  ModuleState extends Record<any, any>,
-> extends MixableVisitor<GlobalState, ModuleState & ModuleAwareState> {
-  static getSourceForImport(state: ModuleAwareState, importName: string) {
-    return state.imports.find((imported) =>
-      imported.identifiers.includes(importName)
-    )?.source;
-  }
+/**
+ * principles: state separation but easy access to mixin state
+ *
+ * mixins do not affect global state, it's up to the visitor objects to decide what state is global
+ */
 
-  constructor(options: BaseVisitorOptions<GlobalState, ModuleState> = {}) {
-    super({
-      initialGlobalState: {
-        ...options.initialGlobalState,
-      } as GlobalState,
-      initialModuleState: {
-        ...options.initialModuleState,
-        currentSourceFile: "",
-        imports: [] as ModuleAwareState["imports"],
-      } as ModuleState & ModuleAwareState,
-    });
+export class ModuleTrackingMixin extends MixableVisitor<any, any> {
+  private state: ModuleAwareState = {
+    currentSourceFile: "",
+    imports: [],
+  };
+
+  get currentSourceFile() {
+    return this.state.currentSourceFile;
   }
 
   get mixinCases() {
     return [
-      this.case(isSourceFile, (node, { moduleState }) => {
-        moduleState.currentSourceFile = node.fileName;
+      this.case(isSourceFile, (node) => {
+        this.state.currentSourceFile = node.fileName;
       }),
 
-      this.case(isImportDeclaration, (node, { moduleState }) => {
+      this.case(isImportDeclaration, (node) => {
         const importClause = node.importClause;
         const namedIdentifiers: string[] = [];
         const source = isStringLiteral(node.moduleSpecifier)
@@ -61,7 +54,7 @@ export class ModuleAwareVisitor<
           importClause.name &&
           isIdentifier(importClause.name)
         ) {
-          moduleState.imports.push({
+          this.state.imports.push({
             type: "default",
             identifiers: [importClause.name.escapedText as string],
             source,
@@ -81,7 +74,7 @@ export class ModuleAwareVisitor<
           });
 
           if (namedIdentifiers.length) {
-            moduleState.imports.push({
+            this.state.imports.push({
               type: "named",
               identifiers: namedIdentifiers,
               source,
