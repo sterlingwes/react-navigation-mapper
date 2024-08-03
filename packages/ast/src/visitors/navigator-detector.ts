@@ -21,10 +21,12 @@ import {
   getJsxAttributeWithObjectLiteralValue,
   getJsxAttributeWithStringValue,
 } from "./utils/jsx";
+import { ModuleTrackingMixin } from "./mixable/module-tracking-mixin";
 
 type Screen = {
   name: string;
   component: string;
+  importPath?: string;
   options?: Record<string, unknown>;
 };
 
@@ -57,6 +59,7 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
   ModuleState
 > {
   private componentTracking = new ComponentTrackingMixin();
+  private moduleTracking = new ModuleTrackingMixin();
 
   constructor() {
     super({
@@ -108,6 +111,9 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
               attributeIdentifierStringValue
             ) {
               screen.component = attributeIdentifierStringValue;
+              screen.importPath = this.moduleTracking.getImportForIdentifier(
+                attributeIdentifierStringValue
+              )?.source;
               return;
             }
 
@@ -139,6 +145,7 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
     ]);
 
     this.mixins.add(this.componentTracking);
+    this.mixins.add(this.moduleTracking);
   }
 
   private addScreen(screen: Screen) {

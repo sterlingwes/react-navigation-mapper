@@ -36,6 +36,16 @@ export class ModuleTrackingMixin extends MixableVisitor<any, any> {
     return this.state.currentSourceFile;
   }
 
+  get imports() {
+    return this.state.imports;
+  }
+
+  getImportForIdentifier(identifier: string) {
+    return this.state.imports.find((imp) =>
+      imp.identifiers.includes(identifier)
+    );
+  }
+
   get mixinCases() {
     return [
       this.case(isSourceFile, (node) => {
