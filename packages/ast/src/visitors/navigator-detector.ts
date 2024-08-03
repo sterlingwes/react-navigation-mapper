@@ -13,7 +13,8 @@ import {
   resolveNavigatorNamespaceFromFactoryCall,
 } from "./utils/navigators";
 import { jsxElementIsScreen } from "./utils/stack-screen";
-import { ComponentAwareVisitor } from "./mixable/component-aware-visitor";
+import { BaseVisitor } from "./abstract/base-visitor";
+import { ComponentTrackingMixin } from "./mixable/component-tracking-mixin";
 
 type Screen = {
   name: string;
@@ -44,10 +45,12 @@ interface ModuleState {
 // maybe this query lib can help? https://github.com/phenomnomnominal/tsquery
 // can filter to files that have the import specifier then query further
 
-export class NavigatorDetectorVisitor extends ComponentAwareVisitor<
+export class NavigatorDetectorVisitor extends BaseVisitor<
   GlobalState,
   ModuleState
 > {
+  private componentTracking = new ComponentTrackingMixin();
+
   constructor() {
     super({
       initialGlobalState: {
@@ -112,6 +115,8 @@ export class NavigatorDetectorVisitor extends ComponentAwareVisitor<
         }
       }),
     ]);
+
+    this.mixins.add(this.componentTracking);
   }
 
   private addScreen(screen: Screen) {
@@ -147,7 +152,7 @@ export class NavigatorDetectorVisitor extends ComponentAwareVisitor<
   }
 
   private ensureComponent(detail = "") {
-    const component = this.moduleState.currentComponent;
+    const component = this.componentTracking.current;
     if (!component) {
       throw new Error(`No component name set, expected to find one: ${detail}`);
     }

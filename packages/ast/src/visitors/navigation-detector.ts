@@ -13,8 +13,9 @@ import {
   propertyAccessIsOnNavigation,
   typeReferenceIsNavigationScreenProp,
 } from "./utils/navigation-prop";
-import { ComponentAwareVisitor } from "./mixable/component-aware-visitor";
 import { ModuleTrackingMixin } from "./mixable/module-tracking-mixin";
+import { BaseVisitor } from "./abstract/base-visitor";
+import { ComponentTrackingMixin } from "./mixable/component-tracking-mixin";
 
 type NavigationCall = {
   method: "push" | "replace" | "navigate";
@@ -37,10 +38,11 @@ interface ModuleState {
   currentComponentNavigationCalls: NavigationCall[];
 }
 
-export class NavigationDetectorVisitor extends ComponentAwareVisitor<
+export class NavigationDetectorVisitor extends BaseVisitor<
   GlobalState,
   ModuleState
 > {
+  private componentTracking = new ComponentTrackingMixin();
   private moduleTracking = new ModuleTrackingMixin();
 
   constructor() {
@@ -94,10 +96,10 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
         onExit: (node, { moduleState, globalState }) => {
           if (
             this.insideComponent() &&
-            node.pos === moduleState.currentComponentPosition
+            node.pos === this.componentTracking.position
           ) {
             globalState.components.push({
-              name: moduleState.currentComponent!,
+              name: this.componentTracking.current!,
               navigationCalls:
                 moduleState.currentComponentNavigationCalls.slice(),
               source: this.moduleTracking.currentSourceFile,
@@ -109,10 +111,11 @@ export class NavigationDetectorVisitor extends ComponentAwareVisitor<
       }),
     ]);
 
+    this.mixins.add(this.componentTracking);
     this.mixins.add(this.moduleTracking);
   }
 
   private insideComponent = () => {
-    return this.moduleState.currentComponent !== undefined;
+    return this.componentTracking.current !== undefined;
   };
 }
