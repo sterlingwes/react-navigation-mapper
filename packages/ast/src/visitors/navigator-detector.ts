@@ -34,6 +34,7 @@ type Stack = {
   name: string;
   namespace: string;
   screens: Array<Screen>;
+  source: string;
 };
 
 interface GlobalState {
@@ -46,14 +47,9 @@ interface ModuleState {
   stackComponentName: string;
 }
 
-// check if import specifier exists
-// if so, check if factory is called and track identifier
-// if so, check for identifier in JSX tags
-// if so, capture params passed to those components as screen routes
-//
-// maybe this query lib can help? https://github.com/phenomnomnominal/tsquery
-// can filter to files that have the import specifier then query further
-
+/**
+ * currently assumes the full navigator is defined in the same module file
+ */
 export class NavigatorDetectorVisitor extends BaseVisitor<
   GlobalState,
   ModuleState
@@ -172,6 +168,7 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
         name: component,
         namespace,
         screens: [],
+        source: this.moduleTracking.currentSourceFile,
       };
     } else {
       console.warn(

@@ -37,6 +37,7 @@ exports[`NavigatorDetector visitor single navigator stack with multiple screens 
         },
       },
     ],
+    "source": "submodules/react-navigation/example/src/Screens/NativeStack.tsx",
   },
 }
 `;
