@@ -5,7 +5,7 @@ exports[`mapProject should return 1`] = `
   {
     "components": [
       {
-        "name": "restoreState",
+        "name": "App",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/index.tsx",
       },
@@ -49,7 +49,7 @@ exports[`mapProject should return 1`] = `
         "source": "submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx",
       },
       {
-        "name": "onPress",
+        "name": "NativeStackScreen",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/Screens/NativeStackHeaderCustomization.tsx",
       },
@@ -425,11 +425,6 @@ exports[`mapProject should return 1`] = `
   {
     "components": [
       {
-        "name": "useIsLargeScreen",
-        "navigationCalls": [],
-        "source": "submodules/react-navigation/example/src/Screens/MasterDetail.tsx",
-      },
-      {
         "name": "Header",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/Screens/MasterDetail.tsx",
@@ -467,6 +462,18 @@ exports[`mapProject should return 1`] = `
   {
     "components": [
       {
+        "name": "CustomTabBar",
+        "navigationCalls": [],
+        "source": "submodules/react-navigation/example/src/Screens/TabView/CustomTabBar.tsx",
+      },
+    ],
+    "skippable": false,
+    "source": "submodules/react-navigation/example/src/Screens/TabView/CustomTabBar.tsx",
+    "stacks": {},
+  },
+  {
+    "components": [
+      {
         "name": "Scene",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/Screens/TabView/Coverflow.tsx",
@@ -484,12 +491,43 @@ exports[`mapProject should return 1`] = `
   {
     "components": [
       {
-        "name": "renderIndicator",
+        "name": "ScrollableTabBar",
         "navigationCalls": [],
-        "source": "submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx",
+        "source": "submodules/react-navigation/example/src/Screens/TabView/ScrollableTabBar.tsx",
       },
+    ],
+    "skippable": false,
+    "source": "submodules/react-navigation/example/src/Screens/TabView/ScrollableTabBar.tsx",
+    "stacks": {},
+  },
+  {
+    "components": [
       {
-        "name": "renderBadge",
+        "name": "TabBarIcon",
+        "navigationCalls": [],
+        "source": "submodules/react-navigation/example/src/Screens/TabView/TabBarIcon.tsx",
+      },
+    ],
+    "skippable": false,
+    "source": "submodules/react-navigation/example/src/Screens/TabView/TabBarIcon.tsx",
+    "stacks": {},
+  },
+  {
+    "components": [
+      {
+        "name": "AutoWidthTabBar",
+        "navigationCalls": [],
+        "source": "submodules/react-navigation/example/src/Screens/TabView/AutoWidthTabBar.tsx",
+      },
+    ],
+    "skippable": false,
+    "source": "submodules/react-navigation/example/src/Screens/TabView/AutoWidthTabBar.tsx",
+    "stacks": {},
+  },
+  {
+    "components": [
+      {
+        "name": "CustomIndicator",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/Screens/TabView/CustomIndicator.tsx",
       },
@@ -502,6 +540,11 @@ exports[`mapProject should return 1`] = `
     "components": [
       {
         "name": "ItemSeparator",
+        "navigationCalls": [],
+        "source": "submodules/react-navigation/example/src/Shared/Contacts.tsx",
+      },
+      {
+        "name": "Contacts",
         "navigationCalls": [],
         "source": "submodules/react-navigation/example/src/Shared/Contacts.tsx",
       },

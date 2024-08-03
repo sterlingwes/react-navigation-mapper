@@ -1,14 +1,20 @@
 import ts, {
   isArrowFunction,
   isFunctionDeclaration,
+  isIdentifier,
   isVariableDeclaration,
 } from "typescript";
+
+const hasComponentName = (name: string) => /^[A-Z]/.test(name);
 
 export const varDeclarationIsPossibleFunctionComponent = (
   node: ts.VariableDeclaration
 ) => {
   return (
-    node.initializer?.kind === ts.SyntaxKind.ArrowFunction ||
+    (isIdentifier(node.name) &&
+      node.name.escapedText &&
+      hasComponentName(node.name.escapedText as string) &&
+      node.initializer?.kind === ts.SyntaxKind.ArrowFunction) ||
     node.initializer?.kind === ts.SyntaxKind.FunctionExpression
   );
 };
@@ -19,7 +25,7 @@ export const functionDeclarationIsPossibleComponent = (
   return (
     node.name &&
     ts.isIdentifier(node.name) &&
-    /^[A-Z]/.test(node.name.escapedText as string) &&
+    hasComponentName(node.name.escapedText as string) &&
     !!node.modifiers &&
     !!node.modifiers.find((mod) => mod.kind === ts.SyntaxKind.ExportKeyword)
   );
