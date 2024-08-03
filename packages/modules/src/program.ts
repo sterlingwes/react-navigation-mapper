@@ -8,15 +8,23 @@ type FileLookup = {
   };
 };
 
-type ModuleOptions = {
+interface DrilldownOptions {
+  onSourceFile?: (sourceFile: ts.SourceFile) => void;
+}
+
+interface ModuleOptions extends DrilldownOptions {
   moduleSearchLocations: string[];
   rootPath: string;
   files: FileLookup;
-};
+}
+
+interface ProgramLookupOptions extends DrilldownOptions {
+  rootPath?: string;
+}
 
 export const createProgramLookup = (
   projectPath: string,
-  options?: { rootPath?: string }
+  options?: ProgramLookupOptions
 ) => {
   const files: FileLookup = {};
   const basePath = projectPath.startsWith("./")
@@ -26,6 +34,7 @@ export const createProgramLookup = (
   const rootPath = (options?.rootPath ?? path.dirname(__dirname)) + "/";
 
   const program = compile(paths, {
+    ...options,
     moduleSearchLocations: [basePath],
     rootPath,
     files,
@@ -48,7 +57,13 @@ function createCompilerHost(
   moduleOptions: ModuleOptions
 ): ts.CompilerHost {
   return {
-    getSourceFile,
+    getSourceFile: (fileName, languageVersion, onError) => {
+      const sourceFile = getSourceFile(fileName, languageVersion, onError);
+      if (sourceFile && moduleOptions.onSourceFile) {
+        moduleOptions.onSourceFile(sourceFile);
+      }
+      return sourceFile;
+    },
     getDefaultLibFileName: () => "lib.d.ts",
     writeFile: (fileName, content) => ts.sys.writeFile(fileName, content),
     getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
@@ -72,7 +87,7 @@ function createCompilerHost(
 
   function getSourceFile(
     fileName: string,
-    languageVersion: ts.ScriptTarget,
+    languageVersion: ts.ScriptTarget | ts.CreateSourceFileOptions,
     onError?: (message: string) => void
   ) {
     const sourceText = ts.sys.readFile(fileName);

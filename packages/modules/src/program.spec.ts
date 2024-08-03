@@ -12,4 +12,15 @@ describe("createProgramLookup", () => {
     );
     expect(files).toMatchSnapshot();
   });
+
+  it('should callback with source files with "onSourceFile" option', () => {
+    const callbacks: string[] = [];
+    createProgramLookup("submodules/react-navigation/example/src", {
+      rootPath,
+      onSourceFile: (sourceFile) => {
+        callbacks.push(sourceFile.fileName);
+      },
+    });
+    expect(callbacks).toMatchSnapshot();
+  });
 });
