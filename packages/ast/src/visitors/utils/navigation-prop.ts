@@ -54,6 +54,7 @@ export const getNavigationHookReturn = (
   if (
     isIdentifier(node.expression) &&
     node.expression.escapedText === hookName &&
+    node.parent &&
     isVariableDeclaration(node.parent) &&
     node.parent.name &&
     isIdentifier(node.parent.name)
