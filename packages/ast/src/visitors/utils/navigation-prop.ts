@@ -1,4 +1,8 @@
-import ts, { isImportDeclaration } from "typescript";
+import ts, {
+  isIdentifier,
+  isImportDeclaration,
+  isVariableDeclaration,
+} from "typescript";
 import { nearestParentOfType } from "./traversal";
 
 export const importSpecifierIsNativeStackScreenPropsType = (
@@ -33,13 +37,29 @@ export const typeReferenceIsNavigationScreenProp = (
 };
 
 export const propertyAccessIsOnNavigation = (
-  node: ts.PropertyAccessExpression
+  node: ts.PropertyAccessExpression,
+  navigationPropName: string
 ) => {
   return (
     node.expression.kind === ts.SyntaxKind.Identifier &&
-    (node.expression as ts.Identifier).escapedText === "navigation" &&
+    (node.expression as ts.Identifier).escapedText === navigationPropName &&
     node.parent.kind === ts.SyntaxKind.CallExpression
   );
+};
+
+export const getNavigationHookReturn = (
+  node: ts.CallExpression,
+  hookName: string
+) => {
+  if (
+    isIdentifier(node.expression) &&
+    node.expression.escapedText === hookName &&
+    isVariableDeclaration(node.parent) &&
+    node.parent.name &&
+    isIdentifier(node.parent.name)
+  ) {
+    return node.parent.name.escapedText as string;
+  }
 };
 
 export const getNavigationMethodName = (node: ts.PropertyAccessExpression) => {

@@ -15,7 +15,7 @@ import {
 
 interface ComponentAwareState extends Record<any, any> {
   current: string | undefined;
-  position: number | undefined;
+  position: readonly [number, number] | undefined;
 }
 
 /**
@@ -42,15 +42,35 @@ export class ComponentTrackingMixin extends MixableVisitor<any, any> {
     return [
       this.case(isVariableDeclaration, (node) => {
         if (varDeclarationIsPossibleFunctionComponent(node)) {
+          const position = getBlockPosition(node);
+          if (
+            this.state.current &&
+            this.state.position &&
+            position[0] > this.state.position[0] &&
+            position[0] < this.state.position[1]
+          ) {
+            // do not overwrite current component if we are inside one
+            return;
+          }
           this.state.current = getVarDeclarationName(node);
-          this.state.position = getBlockPosition(node);
+          this.state.position = position;
         }
       }),
 
       this.case(isFunctionDeclaration, (node) => {
         if (functionDeclarationIsPossibleComponent(node)) {
+          const position = getBlockPosition(node);
+          if (
+            this.state.current &&
+            this.state.position &&
+            position[0] > this.state.position[0] &&
+            position[0] < this.state.position[1]
+          ) {
+            // do not overwrite current component if we are inside one
+            return;
+          }
           this.state.current = getFunctionDeclarationName(node);
-          this.state.position = getBlockPosition(node);
+          this.state.position = position;
         }
       }),
 
@@ -58,7 +78,7 @@ export class ComponentTrackingMixin extends MixableVisitor<any, any> {
         onExit: (node) => {
           if (
             this.state.current !== undefined &&
-            node.pos === this.state.position
+            node.pos === this.state.position?.[0]
           ) {
             // run our cleanup after subclassed exit logic for blocks
             return () => {

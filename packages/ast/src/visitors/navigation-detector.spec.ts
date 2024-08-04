@@ -25,4 +25,21 @@ describe("NavigationDetector visitor", () => {
       expect(visitor.globalState.components).toMatchSnapshot();
     });
   });
+
+  describe("nested components", () => {
+    it("should only register the parent / export", () => {
+      const fileName = "fixtures/nested-components.tsx";
+      const file = ts.createSourceFile(
+        fileName,
+        fs.readFileSync(fileName).toString(),
+        ts.ScriptTarget.ES2015,
+        /*setParentNodes */ true
+      );
+
+      const visitor = new NavigationDetectorVisitor();
+      visitor.visit(file);
+
+      expect(visitor.globalState.components).toMatchSnapshot();
+    });
+  });
 });

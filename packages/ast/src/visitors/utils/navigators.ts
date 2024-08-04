@@ -1,17 +1,10 @@
 import ts from "typescript";
 import { nearestParentOfType } from "./traversal";
 
-const stackFactories = {
-  "@react-navigation/stack": "createStackNavigator",
-  "@react-navigation/drawer": "createDrawerNavigator",
-  "@react-navigation/bottom-tabs": "createBottomTabNavigator",
-  "@react-navigation/native-stack": "createNativeStackNavigator",
-  "@react-navigation/material-top-tabs": "createMaterialTopTabNavigator",
-};
-
 // TODO: handle 'all as' import style
 export const resolveNavigationStackImportFactoryName = (
-  node: ts.ImportSpecifier
+  node: ts.ImportSpecifier,
+  stackFactories: Record<string, string>
 ) => {
   const nearestImportDeclaration = nearestParentOfType(
     node,

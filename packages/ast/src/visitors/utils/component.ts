@@ -54,11 +54,12 @@ export const getBlockPosition = (
     node.initializer &&
     isArrowFunction(node.initializer)
   ) {
-    return (node.initializer as ts.ArrowFunction).body.pos;
+    const { pos, end } = node.initializer.body;
+    return [pos, end] as const;
   }
 
   if (isFunctionDeclaration(node) && node.body) {
-    return node.body.pos;
+    return [node.body.pos, node.body.end] as const;
   }
 
   throw new Error(

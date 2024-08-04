@@ -43,3 +43,18 @@ exports[`NavigationDetector visitor multi screen simple navigate calls should de
   },
 ]
 `;
+
+exports[`NavigationDetector visitor nested components should only register the parent / export 1`] = `
+[
+  {
+    "name": "ParentComponent",
+    "navigationCalls": [
+      {
+        "destination": "NextScreen",
+        "method": "push",
+      },
+    ],
+    "source": "fixtures/nested-components.tsx",
+  },
+]
+`;

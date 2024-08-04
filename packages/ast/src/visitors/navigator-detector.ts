@@ -22,6 +22,7 @@ import {
   getJsxAttributeWithStringValue,
 } from "./utils/jsx";
 import { ModuleTrackingMixin } from "./mixable/module-tracking-mixin";
+import { defaultStackFactories } from "./constants/stack-factories";
 
 type Screen = {
   name: string;
@@ -47,6 +48,10 @@ interface ModuleState {
   stackComponentName: string;
 }
 
+interface PublicOptions {
+  stackFactories?: Record<string, string>;
+}
+
 /**
  * currently assumes the full navigator is defined in the same module file
  */
@@ -57,7 +62,7 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
   private componentTracking = new ComponentTrackingMixin();
   private moduleTracking = new ModuleTrackingMixin();
 
-  constructor() {
+  constructor(options: PublicOptions = {}) {
     super({
       initialGlobalState: {
         stacks: {},
@@ -69,9 +74,14 @@ export class NavigatorDetectorVisitor extends BaseVisitor<
       },
     });
 
+    const stackFactoryLookup = options?.stackFactories ?? defaultStackFactories;
+
     this.addVisitorCases([
       this.case(isImportSpecifier, (node, { moduleState }) => {
-        const factoryMatch = resolveNavigationStackImportFactoryName(node);
+        const factoryMatch = resolveNavigationStackImportFactoryName(
+          node,
+          stackFactoryLookup
+        );
         if (factoryMatch) {
           moduleState.stackFactory = factoryMatch;
         }
